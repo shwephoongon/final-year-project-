@@ -11,12 +11,21 @@ import {
   Tabs,
   Tab,
   Fade,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import WifiIcon from "@mui/icons-material/Wifi";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import BathtubIcon from "@mui/icons-material/Bathtub";
 import KingBedIcon from "@mui/icons-material/KingBed";
 import BookingProgress from "../components/BookingProgress";
+import RoomSelector from "../components/RoomSelector";
+import CustomDateRangePicker from "../components/CustomDateRangePicker";
+import RoomFilterBar from "../components/RoomFilterBar";
+import RoomCard from "../components/RoomCard";
 
 const roomData = {
   Deluxe: [
@@ -62,53 +71,60 @@ const RoomList = () => {
   const [selectedBed, setSelectedBed] = useState("Queen");
   const [showOffers, setShowOffers] = useState(false);
   const [activeTab, setActiveTab] = useState("Deluxe");
+  const [filters, setFilters] = useState({
+    bedType: [],
+    viewType: [],
+    accessibility: [],
+  });
+  // New state for filters
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [numRooms, setNumRooms] = useState(1);
+  const [numGuests, setNumGuests] = useState(1);
+
+  // inside your component
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [rooms, setRooms] = useState([{ guests: 1 }]);
+
+  // Function to add a new room
+  const handleAddRoom = () => {
+    setRooms([...rooms, { guests: 1 }]);
+  };
+
+  // Function to update guests for a specific room
+  const handleRoomChange = (index, guests) => {
+    const updated = [...rooms];
+    updated[index].guests = guests;
+    setRooms(updated);
+  };
 
   return (
     <Box sx={{ backgroundColor: "#f0f8ff", minHeight: "100vh" }}>
+      {/* Blue Bar with Filters */}
       <Box
         sx={{
-          width: "60%", // align with stepper
-          mx: "auto",
-          display: "flex",
-          alignItems: "center",
-          gap: 1, // minimal space between date and button
-          mb: 2,
+          // width: "100%",
+          backgroundColor: "#1976d2",
+          color: "white",
+          py: 2,
+          px: { xs: 2, md: 6 },
         }}
       >
-        {/* Date Range */}
-        <Typography
-          variant='h6'
-          sx={{
-            fontWeight: 600,
-            color: "#1976d2", // highlight with blue
-          }}
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          justifyContent='space-between'
+          alignItems='center'
         >
-          Aug 20, 2025 - Aug 25, 2025
-        </Typography>
+          <CustomDateRangePicker
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+          />
 
-        {/* Modify Button */}
-        <Button
-          variant='outlined'
-          sx={{
-            borderColor: "#1976d2",
-            backgroundColor: "#e3f2fd",
-            color: "#1976d2",
-            fontWeight: 500,
-            fontSize: "0.8rem",
-            textTransform: "none",
-            px: 2,
-            py: 0.5,
-            "&:hover": {
-              backgroundColor: "#bbdefb",
-              borderColor: "#1976d2",
-            },
-          }}
-        >
-          Modify
-        </Button>
+          <RoomSelector />
+        </Stack>
       </Box>
       <BookingProgress />
-
       {/* Tabs */}
       <Box
         sx={{
@@ -130,9 +146,10 @@ const RoomList = () => {
             <Tab key={category} label={category} value={category} />
           ))}
         </Tabs>
+        {/* Filter component */}
+        <RoomFilterBar filters={filters} setFilters={setFilters} />
       </Box>
-
-      {/* Room Cards */}
+     {/* Room Cards */}
       <Box
         sx={{
           display: "flex",
@@ -143,131 +160,7 @@ const RoomList = () => {
       >
         <Stack spacing={3} sx={{ width: "85%" }}>
           {roomData[activeTab].map((room, idx) => (
-            <Fade in key={idx}>
-              <Paper
-                elevation={1}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#fff",
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "flex-start",
-                  minHeight: 350,
-                }}
-              >
-                {/* Left: Image */}
-                <Box
-                  component='img'
-                  src='/sampleroom.jfif'
-                  alt={room.title}
-                  sx={{
-                    width: "27%",
-                    height: 250,
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-
-                {/* Right: Text Content */}
-                <Box sx={{ flex: 1, p: 4 }}>
-                  <Typography variant='h6' gutterBottom>
-                    {room.title}
-                  </Typography>
-
-                  <Typography
-                    variant='body2'
-                    color='text.secondary'
-                    gutterBottom
-                    sx={{ mb: 2 }}
-                  >
-                    {room.size}
-                  </Typography>
-
-                  {/* Bed type selector */}
-                  <Stack direction='row' spacing={1} mb={3}>
-                    {["Queen", "King", "Twin"].map((bed) => (
-                      <Chip
-                        key={bed}
-                        label={bed}
-                        icon={<KingBedIcon />}
-                        clickable
-                        color={selectedBed === bed ? "primary" : "default"}
-                        onClick={() => setSelectedBed(bed)}
-                      />
-                    ))}
-                  </Stack>
-
-                  <Typography variant='body2' gutterBottom sx={{ mb: 3 }}>
-                    {room.description}
-                  </Typography>
-
-                  {/* Amenities */}
-                  <Grid container spacing={2} sx={{ mb: 3 }}>
-                    {room.amenities.includes("Wi-Fi") && (
-                      <Grid item xs={6} sm={4}>
-                        <Stack direction='row' spacing={1} alignItems='center'>
-                          <WifiIcon fontSize='small' />
-                          <Typography variant='body2'>Free Wi-Fi</Typography>
-                        </Stack>
-                      </Grid>
-                    )}
-                    {room.amenities.includes("Breakfast") && (
-                      <Grid item xs={6} sm={4}>
-                        <Stack direction='row' spacing={1} alignItems='center'>
-                          <FreeBreakfastIcon fontSize='small' />
-                          <Typography variant='body2'>Breakfast</Typography>
-                        </Stack>
-                      </Grid>
-                    )}
-                    {room.amenities.includes("Private Bath") && (
-                      <Grid item xs={6} sm={4}>
-                        <Stack direction='row' spacing={1} alignItems='center'>
-                          <BathtubIcon fontSize='small' />
-                          <Typography variant='body2'>Private Bath</Typography>
-                        </Stack>
-                      </Grid>
-                    )}
-                  </Grid>
-
-                  {/* Price + Button */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: 1,
-                      pb: 3,
-                    }}
-                  >
-                    <Typography variant='h6' sx={{ fontWeight: "bold" }}>
-                      ${room.price} / night
-                    </Typography>
-                    <Button
-                      variant='outlined'
-                      onClick={() => setShowOffers(!showOffers)}
-                    >
-                      {showOffers ? "Hide offers" : "See more offers"}
-                    </Button>
-                  </Box>
-
-                  {/* Expandable offers */}
-                  <Collapse in={showOffers} sx={{ mt: 3 }}>
-                    <Stack spacing={1}>
-                      <Paper variant='outlined' sx={{ p: 2 }}>
-                        Room only — ${room.price}
-                      </Paper>
-                      <Paper variant='outlined' sx={{ p: 2 }}>
-                        Bed & Breakfast — ${room.price + 15}
-                      </Paper>
-                      <Paper variant='outlined' sx={{ p: 2 }}>
-                        Half-board — ${room.price + 40}
-                      </Paper>
-                    </Stack>
-                  </Collapse>
-                </Box>
-              </Paper>
-            </Fade>
+            <RoomCard room={room} idx={idx} />
           ))}
         </Stack>
       </Box>
