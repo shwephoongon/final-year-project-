@@ -40,17 +40,16 @@ export default function RoomCard({ room, idx }) {
   ];
 
   return (
-    <Fade in key={idx}>
       <Paper
-        elevation={1}
+        elevation={0}
         sx={{
-          p: 4,
           borderRadius: 3,
           backgroundColor: "#fff",
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
-          //minHeight: 320,
+          border: "1px solid #e0e0e0", // light grey border
+          Height: 400,
         }}
       >
         {/* Left: Image */}
@@ -59,20 +58,20 @@ export default function RoomCard({ room, idx }) {
           src='/sampleroom.jfif'
           alt={room.title}
           sx={{
-            width: "45%",
-            //height: 250,
+            width: 500,
+            height: 400,
             objectFit: "cover",
             display: "block",
           }}
         />
 
         {/* Right: Text Content */}
-        <Box sx={{ flex: 1, paddingLeft: 4 }}>
-          <Box>
+        <Box sx={{ flex: 1,paddingLeft:5 }}>
+          <Box sx={{}}>
             <Typography
               variant='h6'
               gutterBottom
-              sx={{ fontWeight: "bold", fontSize: "1.5rem" }}
+              sx={{ fontWeight: "bold", fontSize: "1.5rem",marginTop:2 }}
             >
               {room.title}
             </Typography>
@@ -94,10 +93,13 @@ export default function RoomCard({ room, idx }) {
                   label={bed}
                   //icon={<KingBedIcon />}
                   clickable
-                  color={selectedBed === bed ? "primary" : "default"}
+                  // color={"white"}
                   sx={{
                     p: 2,
-                    borderRadius: 5,
+                    borderRadius: 1,
+                    backgroundColor: selectedBed == bed ? "#286fd2ff" : "white",
+                    color: selectedBed == bed ? "white" : "#286fd2ff",
+                    border: "1px solid #989ca4",
                     // borderStyle: "solid",
                     // borderWidth: 1,
                     // borderColor: "grey",
@@ -110,8 +112,8 @@ export default function RoomCard({ room, idx }) {
             <Box display={"flex"} flexDirection={"row"}>
               <Box
                 sx={{
-                  borderRight: "1px solid #ccc",
-                  height: "200px",
+                  //borderRight: "1px solid #ccc",
+                  //height: "100%",
                   width: "65%",
                 }}
               >
@@ -126,12 +128,12 @@ export default function RoomCard({ room, idx }) {
                       direction='row' // Column layout
                       spacing={2} // Space between icon and text
                       alignItems='center' // Center horizontally
-                      sx={{ width: "100px", paddingBottom: 1 }} // Fixed width for uniformity
+                      sx={{ width: "140px", paddingBottom: 1 }} // Fixed width for uniformity
                     >
                       {amenity.icon}
                       <Typography
                         variant='body2'
-                        sx={{ fontSize: "0.75rem", textAlign: "center" }}
+                        sx={{ fontSize: "0.9rem", textAlign: "center" }}
                       >
                         {amenity.label}
                       </Typography>
@@ -139,17 +141,19 @@ export default function RoomCard({ room, idx }) {
                   );
                 })}
               </Box>
-              <Box sx={{ paddingLeft: 2 }}>
-                <Typography>28 m2 | 300ft2</Typography>
-                <Typography>2 guests</Typography>
+                <Box sx={{ paddingLeft: 8 }}>
+                  <Typography>28 m2 | 300ft2</Typography>
+                  <Typography>2 guests</Typography>
 
-                <Box sx={{ marginTop: 5 }}>
-                  <Typography variant='body2'>From</Typography>
-                  <Typography variant='h5'>$336/Night</Typography>
+                  <Box sx={{ marginTop: 12 }}>
+                    <Typography variant='body2'>From</Typography>
+                    <Typography variant='h5'>$336/Night</Typography>
                 </Box>
-                <Button sx={{ backgroundColor: "#1976d2", marginTop: 2 }}>
-                  <Typography color='white'>View Offers</Typography>
-                </Button>
+                  <Box sx={{marginTop:2}}>
+                    <Button sx={{ backgroundColor: "#4caf50"}}>
+                      <Typography color='white'>View Offers</Typography>
+                    </Button>
+                  </Box>
               </Box>
             </Box>
 
@@ -175,7 +179,7 @@ export default function RoomCard({ room, idx }) {
                   </Box> */}
 
             {/* Expandable offers */}
-            <Collapse in={showOffers} sx={{ mt: 3 }}>
+            {/* <Collapse in={showOffers} sx={{ mt: 3 }}>
               <Stack spacing={1}>
                 <Paper variant='outlined' sx={{ p: 2 }}>
                   Room only — ${room.price}
@@ -187,10 +191,9 @@ export default function RoomCard({ room, idx }) {
                   Half-board — ${room.price + 40}
                 </Paper>
               </Stack>
-            </Collapse>
+            </Collapse> */}
           </Box>
         </Box>
       </Paper>
-    </Fade>
   );
 }

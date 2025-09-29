@@ -15,29 +15,54 @@ const NavigationBar = () => {
 
   return (
     <AppBar
-      position="static"
+      position='static'
       sx={{
         backgroundColor: "#ffffff",
         color: "#000000",
         boxShadow: "none",
-        height: "50px", // thin navbar
+        height: "60px", // slightly taller to fit logo nicely
         justifyContent: "center",
+        borderBottom: "1px solid #e0e0e0", // ✅ light grey underline
+        // backgroundColor: "#ffffff",
+        // color: "#000000",
+        // boxShadow: "none",
+        // height: "60px", // slightly taller to fit logo nicely
+        // justifyContent: "center",
       }}
     >
-      <Toolbar sx={{ minHeight: "50px", px: { xs: 1, sm: 3 } }}>
-        {/* Left side */}
-        <Typography
-          variant="h6"
-          sx={{
-            textAlign: 'left',
-            flexGrow: 1,
-            fontFamily: "'Times New Roman', serif",
-            fontWeight: 500,
-            fontSize: "1rem",
-          }}
-        >
-          Global Home
-        </Typography>
+      <Toolbar sx={{ minHeight: "60px", px: { xs: 1, sm: 3 } }}>
+        {/* Left side: Easy Hotel Logo */}
+        <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography
+              component='span'
+              sx={{
+                fontFamily: "Pacifico, cursive", // script font for "Easy"
+                fontSize: "28px",
+                letterSpacing: "-0.02em",
+                lineHeight: 1,
+                color: "#0B72FF",
+                textShadow: "0 2px 8px rgba(11,114,255,0.1)",
+              }}
+            >
+              Easy
+            </Typography>
+            <Typography
+              component='span'
+              sx={{
+                fontFamily: "Montserrat, sans-serif", // clean font for "HOTEL"
+                fontSize: "13px",
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#374151",
+                mt: "-2px",
+              }}
+            >
+              HOTEL
+            </Typography>
+          </Box>
+        </Box>
 
         {/* Right side */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -61,12 +86,12 @@ const NavigationBar = () => {
               </Typography>
             </>
           )}
-          <IconButton color="inherit" size="small">
+          {/* <IconButton color="inherit" size="small">
             <PersonIcon />
           </IconButton>
           <IconButton color="inherit" size="small">
             <LoginIcon />
-          </IconButton>
+          </IconButton> */}
         </Box>
       </Toolbar>
     </AppBar>

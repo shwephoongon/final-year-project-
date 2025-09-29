@@ -32,11 +32,14 @@ export default function SimpleDateRangePicker() {
           borderRadius: 2,
           textTransform: "none",
           justifyContent: "flex-start",
-          width: 250,
+          width: 280,
+          fontWeight:'600',
           px: 2,
           py: 1,
           cursor: "pointer",
-          backgroundColor: "#f0f0f0",
+          border: '1px solid #989ca4',
+           color: "#286fd2ff",
+          backgroundColor: "white",
           "&:hover": { backgroundColor: "#f0f0f0" },
         }}
       >

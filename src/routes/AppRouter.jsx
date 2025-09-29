@@ -4,6 +4,7 @@ import Layout from "../Layouts/layout";
 import HomePage from "../pages/HomePage";
 import RoomList from "../pages/RoomList";
 import Enhancement from "../pages/Enhancement";
+import ConfirmBooking from "../pages/ConfirmBooking";
 
 function AppRouter() {
   return (
@@ -15,6 +16,7 @@ function AppRouter() {
           <Route path='/' element={<HomePage />} />
           <Route path='/RoomList' element={<RoomList />} />
           <Route path='/Enhancement' element={<Enhancement />} />
+          <Route path='/confirmbooking' element={<ConfirmBooking />} />
           {/* <Route path="/contact" element={<ContactPage />} /> */}
           <Route path='*' element={<h2>404 - Page Not Found</h2>} />
         </Routes>

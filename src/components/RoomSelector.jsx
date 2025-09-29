@@ -10,8 +10,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import PeopleIcon from "@mui/icons-material/People"; // add at top
 
 export default function RoomSelector() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -44,15 +43,19 @@ export default function RoomSelector() {
     <>
       {/* Trigger Button */}
       <Button
-        variant="contained"
+        startIcon={<PeopleIcon />} // guest capacity icon
+        // variant="contained"
         onClick={() => setDrawerOpen(true)}
         sx={{
+          border: "1px solid #989ca4",
           backgroundColor: "white",
-          color: "#1976d2",
+          color: "#286fd2ff",
           fontWeight: 600,
           borderRadius: 2,
           textTransform: "none",
-          "&:hover": { backgroundColor: "#f0f0f0" },
+          px: 2,
+          py: 1, // match DateRange padding
+          height: 40, // enforce same height
         }}
       >
         {rooms.length} Room{rooms.length > 1 ? "s" : ""},{" "}
@@ -61,12 +64,12 @@ export default function RoomSelector() {
 
       {/* Drawer */}
       <Drawer
-        anchor="right"
+        anchor='right'
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       >
         <Box sx={{ width: 320, p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant='h6' gutterBottom>
             Select Rooms & Guests
           </Typography>
 
@@ -81,18 +84,18 @@ export default function RoomSelector() {
               }}
             >
               <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+                direction='row'
+                justifyContent='space-between'
+                alignItems='center'
                 mb={1}
               >
-                <Typography variant="subtitle1" fontWeight={600}>
+                <Typography variant='subtitle1' fontWeight={600}>
                   Room {index + 1}
                 </Typography>
                 {rooms.length > 1 && (
                   <Button
-                    size="small"
-                    color="error"
+                    size='small'
+                    color='error'
                     onClick={() => removeRoom(index)}
                   >
                     Remove
@@ -102,13 +105,13 @@ export default function RoomSelector() {
 
               {/* Adults */}
               <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+                direction='row'
+                justifyContent='space-between'
+                alignItems='center'
                 mb={1}
               >
                 <Typography>Adults</Typography>
-                <FormControl size="small">
+                <FormControl size='small'>
                   <Select
                     value={room.adults}
                     onChange={(e) =>
@@ -126,12 +129,12 @@ export default function RoomSelector() {
 
               {/* Children */}
               <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+                direction='row'
+                justifyContent='space-between'
+                alignItems='center'
               >
                 <Typography>Children</Typography>
-                <FormControl size="small">
+                <FormControl size='small'>
                   <Select
                     value={room.children}
                     onChange={(e) =>
@@ -151,7 +154,7 @@ export default function RoomSelector() {
 
           {/* Add Room Button */}
           <Button
-            variant="outlined"
+            variant='outlined'
             fullWidth
             onClick={addRoom}
             disabled={rooms.length >= 5}
@@ -162,7 +165,7 @@ export default function RoomSelector() {
 
           {/* Done Button */}
           <Button
-            variant="contained"
+            variant='contained'
             fullWidth
             onClick={() => setDrawerOpen(false)}
           >

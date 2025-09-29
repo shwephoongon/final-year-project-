@@ -33,7 +33,7 @@ const roomData = {
       title: "Deluxe Queen Room",
       size: "350 sq ft / 32 sqm",
       description:
-        "A modern and comfortable room featuring premium bedding, ensuite bathroom, and large windows with city views.",
+        "Two Chamber Design with King Bed featuring a Sleeping Lounge & Dressing Room separated by privacy doors. Showcasing hardwood floors, iconic make-up vanity & walk-in shower with rainfall shower head.",
       price: 120,
       amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
     },
@@ -99,21 +99,22 @@ const RoomList = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#f0f8ff", minHeight: "100vh" }}>
+    <Box sx={{ minHeight: "100vh" }}>
       {/* Blue Bar with Filters */}
       <Box
         sx={{
-          // width: "100%",
-          backgroundColor: "#1976d2",
           color: "white",
           py: 2,
           px: { xs: 2, md: 6 },
+          // backgroundColor: "#f0f8ff",
+          backgroundColor: "#e8f0fd",
+          border: "1px solid #989ca4", // light grey border
         }}
       >
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
-          justifyContent='space-between'
+          //justifyContent='space-between'
           alignItems='center'
         >
           <CustomDateRangePicker
@@ -127,12 +128,19 @@ const RoomList = () => {
       <BookingProgress />
       {/* Tabs */}
       <Box
+        // sx={{
+        //   display: "flex",
+        //   justifyContent: "flex-start",
+        //   mt: 3,
+        //   width: "85%", // match the card stack width
+        //   mx: "auto", // keep it centered horizontally in the viewport
+        // }}
         sx={{
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           mt: 3,
           width: "85%", // match the card stack width
-          mx: "auto", // keep it centered horizontally in the viewport
+          mx: "auto",
         }}
       >
         <Tabs
@@ -140,7 +148,6 @@ const RoomList = () => {
           onChange={(e, newValue) => setActiveTab(newValue)}
           textColor='primary'
           indicatorColor='primary'
-          centered
         >
           {Object.keys(roomData).map((category) => (
             <Tab key={category} label={category} value={category} />
@@ -149,7 +156,7 @@ const RoomList = () => {
         {/* Filter component */}
         <RoomFilterBar filters={filters} setFilters={setFilters} />
       </Box>
-     {/* Room Cards */}
+      {/* Room Cards */}
       <Box
         sx={{
           display: "flex",
