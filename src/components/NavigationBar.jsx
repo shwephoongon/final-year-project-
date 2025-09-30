@@ -41,7 +41,7 @@ const NavigationBar = () => {
                 fontSize: "28px",
                 letterSpacing: "-0.02em",
                 lineHeight: 1,
-                color: "#0B72FF",
+                color: "#1976d2",
                 textShadow: "0 2px 8px rgba(11,114,255,0.1)",
               }}
             >

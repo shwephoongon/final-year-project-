@@ -28,11 +28,17 @@ const ConfirmBooking = () => {
   );
   const textFieldStyle = {
     flex: 1,
-    "& .MuiInput-underline:before": {
-      borderBottomColor: "#ccc",
-    },
-    "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-      borderBottomColor: "#999",
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      "& fieldset": {
+        borderColor: "#e0e0e0",
+      },
+      "&:hover fieldset": {
+        borderColor: "#1976d2",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#1976d2",
+      },
     },
     "&:not(:last-child)": {
       mr: 2,
@@ -43,12 +49,22 @@ const ConfirmBooking = () => {
     <Box
       sx={{
         flexGrow: 1,
-        backgroundColor: "#e6f0ff",
+        backgroundColor: "#ffffff",
         minHeight: "100vh",
-        py: 4,
+        py: 5,
         width: "100%",
       }}
     >
+      {/* Page Header */}
+      <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+          Confirm Your Booking
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Please review your details and complete your reservation
+        </Typography>
+      </Container>
+      
       <Container maxWidth={false} sx={{ width: "90%" }}>
         {/* ===== Guest Information Grid ===== */}
 
@@ -65,11 +81,13 @@ const ConfirmBooking = () => {
                 sx={{
                   backgroundColor: "white",
                   p: 3,
-                  borderRadius: 2,
+                  borderRadius: 3,
                   minHeight: 220,
+                  border: "1px solid #e0e0e0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
-                <Typography variant='h6' fontWeight='bold' gutterBottom>
+                <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
                   Guest Information
                 </Typography>
 
@@ -77,12 +95,14 @@ const ConfirmBooking = () => {
                 <Box display='flex' mb={3}>
                   <TextField
                     label='First Name *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='Last Name *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
@@ -92,13 +112,15 @@ const ConfirmBooking = () => {
                   <TextField
                     label='Email *'
                     type='email'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='Phone *'
                     type='tel'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
@@ -108,13 +130,20 @@ const ConfirmBooking = () => {
                   <TextField
                     fullWidth
                     label='Address *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={{
-                      "& .MuiInput-underline:before": {
-                        borderBottomColor: "#ccc",
-                      },
-                      "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                        borderBottomColor: "#999",
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        "& fieldset": {
+                          borderColor: "#e0e0e0",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#1976d2",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#1976d2",
+                        },
                       },
                     }}
                   />
@@ -124,26 +153,30 @@ const ConfirmBooking = () => {
                 <Box display='flex' mb={3}>
                   <TextField
                     label='Zip Code *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='City *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
 
                 {/* State + Country */}
-                <Box display='flex' mb={3}>
+                <Box display='flex'>
                   <TextField
                     label='State *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='Country *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
@@ -157,34 +190,45 @@ const ConfirmBooking = () => {
                 sx={{
                   backgroundColor: "white",
                   p: 3,
-                  borderRadius: 2,
+                  borderRadius: 3,
                   minHeight: 150,
+                  border: "1px solid #e0e0e0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
-                <Typography variant='h6' fontWeight='bold' gutterBottom>
-                  Card Details
+                <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
+                  Payment Details
                 </Typography>
 
                 {/* Cardholder Name + Card Number */}
                 <Box display='flex' mb={3}>
                   <TextField
                     label='Cardholder Name *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='Card Number *'
-                    variant='standard'
+                    variant='outlined'
+                    size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
 
-                {/* Expiration Date */}
-                <Box display='flex' mb={3}>
+                {/* Expiration Date + CVV */}
+                <Box display='flex'>
                   <TextField
-                    label='Expiration Date *'
-                    variant='standard'
-                    sx={{ flex: 1 }}
+                    label='Expiration Date (MM/YY) *'
+                    variant='outlined'
+                    size='small'
+                    sx={textFieldStyle}
+                  />
+                  <TextField
+                    label='CVV *'
+                    variant='outlined'
+                    size='small'
+                    sx={textFieldStyle}
                   />
                 </Box>
 
@@ -199,21 +243,73 @@ const ConfirmBooking = () => {
 
             {/* Checkboxes Box */}
             <Grid item>
-              <Box sx={{ backgroundColor: "white", p: 3, borderRadius: 2 }}>
+              <Box sx={{ 
+                backgroundColor: "white", 
+                p: 3, 
+                borderRadius: 3,
+                border: "1px solid #e0e0e0",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}>
                 <FormControlLabel
-                  control={<Checkbox />}
-                  label='I have understood and agree to the Booking Conditions and agree to the Privacy Policy'
+                  control={
+                    <Checkbox 
+                      sx={{
+                        color: "#bdbdbd",
+                        "&.Mui-checked": {
+                          color: "#1976d2",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      I have understood and agree to the Booking Conditions and agree to the Privacy Policy
+                    </Typography>
+                  }
+                  sx={{ mb: 1 }}
                 />
                 <FormControlLabel
-                  control={<Checkbox />}
-                  label='Please email me special offers and updates'
+                  control={
+                    <Checkbox 
+                      sx={{
+                        color: "#bdbdbd",
+                        "&.Mui-checked": {
+                          color: "#1976d2",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      Please email me special offers and updates
+                    </Typography>
+                  }
                 />
               </Box>
             </Grid>
             {/* Confirm Booking Button */}
             <Grid item>
               <Box display='flex' justifyContent='center' mt={2}>
-                <Button variant='contained' color='primary' size='large'>
+                <Button 
+                  variant='contained' 
+                  size='large'
+                  sx={{
+                    bgcolor: "#4caf50",
+                    textTransform: "none",
+                    px: 6,
+                    py: 2,
+                    fontWeight: 600,
+                    fontSize: "1.1rem",
+                    borderRadius: 2,
+                    boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
+                    "&:hover": { 
+                      bgcolor: "#45a049",
+                      boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
+                      transform: "translateY(-2px)",
+                    },
+                    transition: "all 0.3s",
+                  }}
+                >
                   Confirm Booking
                 </Button>
               </Box>

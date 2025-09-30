@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Stack,
@@ -26,6 +26,7 @@ import RoomSelector from "../components/RoomSelector";
 import CustomDateRangePicker from "../components/CustomDateRangePicker";
 import RoomFilterBar from "../components/RoomFilterBar";
 import RoomCard from "../components/RoomCard";
+import RoomSelectionTracker from "../components/RoomSelectionTracker";
 
 const roomData = {
   Deluxe: [
@@ -85,6 +86,11 @@ const RoomList = () => {
   // inside your component
   const [dateRange, setDateRange] = useState([null, null]);
   const [rooms, setRooms] = useState([{ guests: 1 }]);
+  
+  // Room selection tracking
+  const [totalRoomsToSelect, setTotalRoomsToSelect] = useState(1);
+  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
 
   // Function to add a new room
   const handleAddRoom = () => {
@@ -96,6 +102,45 @@ const RoomList = () => {
     const updated = [...rooms];
     updated[index].guests = guests;
     setRooms(updated);
+  };
+  
+  // Handle room selection from RoomCard
+  const handleRoomSelect = (roomData, offerType) => {
+    const newSelection = {
+      roomIndex: currentRoomIndex,
+      roomData,
+      offerType,
+    };
+    
+    const updatedSelections = [...selectedRooms];
+    updatedSelections[currentRoomIndex] = newSelection;
+    setSelectedRooms(updatedSelections);
+    
+    // Move to next room if not all selected
+    if (currentRoomIndex < totalRoomsToSelect - 1) {
+      setCurrentRoomIndex(currentRoomIndex + 1);
+    }
+  };
+  
+  // Handle room removal
+  const handleRemoveRoom = (index) => {
+    const updatedSelections = [...selectedRooms];
+    updatedSelections[index] = null; // Set to null instead of removing to maintain indices
+    setSelectedRooms(updatedSelections);
+    
+    // Set current index to the removed room if it was after current
+    if (index <= currentRoomIndex) {
+      setCurrentRoomIndex(index);
+    }
+  };
+  
+  // Navigate to enhancements page
+  const handleNavigateToEnhancements = () => {
+    // Filter out null values before storing
+    const validSelections = selectedRooms.filter(room => room !== null);
+    localStorage.setItem('selectedRooms', JSON.stringify(validSelections));
+    // Navigate to enhancements page
+    window.location.href = '/Enhancement';
   };
 
   return (
@@ -122,7 +167,7 @@ const RoomList = () => {
             setDateRange={setDateRange}
           />
 
-          <RoomSelector />
+          <RoomSelector onRoomCountChange={setTotalRoomsToSelect} />
         </Stack>
       </Box>
       <BookingProgress />
@@ -163,14 +208,31 @@ const RoomList = () => {
           justifyContent: "center",
           alignItems: "flex-start",
           py: 4,
+          pb: selectedRooms.length > 0 ? 12 : 4, // Add padding if tracker is visible
         }}
       >
         <Stack spacing={3} sx={{ width: "85%" }}>
           {roomData[activeTab].map((room, idx) => (
-            <RoomCard room={room} idx={idx} />
+            <RoomCard 
+              key={idx}
+              room={room} 
+              idx={idx}
+              onRoomSelect={handleRoomSelect}
+              currentRoomIndex={currentRoomIndex}
+              totalRooms={totalRoomsToSelect}
+            />
           ))}
         </Stack>
       </Box>
+      
+      {/* Room Selection Tracker */}
+      <RoomSelectionTracker
+        totalRooms={totalRoomsToSelect}
+        currentRoomIndex={currentRoomIndex}
+        selectedRooms={selectedRooms}
+        onNavigateToEnhancements={handleNavigateToEnhancements}
+        onRemoveRoom={handleRemoveRoom}
+      />
     </Box>
   );
 };

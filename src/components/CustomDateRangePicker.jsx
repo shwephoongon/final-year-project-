@@ -26,21 +26,27 @@ export default function SimpleDateRangePicker() {
     <Box>
       <Button
         onClick={handleClick}
-        startIcon={<CalendarMonthIcon />}
+        startIcon={<CalendarMonthIcon sx={{ fontSize: 22 }} />}
         sx={{
-          border: "1px solid #ccc",
           borderRadius: 2,
           textTransform: "none",
           justifyContent: "flex-start",
-          width: 280,
-          fontWeight:'600',
-          px: 2,
-          py: 1,
+          width: 320,
+          fontWeight: 600,
+          px: 3,
+          py: 1.5,
           cursor: "pointer",
-          border: '1px solid #989ca4',
-           color: "#286fd2ff",
+          color: "#1976d2",
           backgroundColor: "white",
-          "&:hover": { backgroundColor: "#f0f0f0" },
+          border: "2px solid transparent",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          transition: "all 0.2s",
+          "&:hover": {
+            backgroundColor: "#f8f8f8",
+            borderColor: "#1976d2",
+            boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
+            transform: "translateY(-1px)",
+          },
         }}
       >
         {`${formatDate(range[0].startDate)} to ${formatDate(range[0].endDate)}`}

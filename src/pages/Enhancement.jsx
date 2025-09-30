@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import UpgradeDrawer from "../components/UpgradeDrawer";
 import BookingDetails from "../components/BookingDetails";
+import { useNavigate } from "react-router-dom";
+
 
 const enhancementsList = [
   {
@@ -59,6 +61,7 @@ const Enhancement = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const toggleDrawer = (status) => setDrawerOpen(status);
+  const navigate = useNavigate();
 
   const totalPrice = bookedRooms.reduce(
     (acc, room) => acc + room.rate * room.quantity * stayDetails.nights,
@@ -74,12 +77,22 @@ const Enhancement = () => {
     <Box
       sx={{
         flexGrow: 1,
-        backgroundColor: "#e6f0ff",
+        backgroundColor: "#ffffff",
         minHeight: "100vh",
-        py: 4,
+        py: 5,
         width: "100%",
       }}
     >
+      {/* Page Header */}
+      <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+          Enhance Your Stay
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Add special touches to make your experience unforgettable
+        </Typography>
+      </Container>
+      
       <Container maxWidth={false} sx={{ width: "90%" }}>
         <Grid container spacing={2}>
           {/* ===== First Column (70%) ===== */}
@@ -95,10 +108,15 @@ const Enhancement = () => {
               <Box
                 sx={{
                   backgroundColor: "white",
-                  p: 2,
-                  borderRadius: 2,
+                  p: 3,
+                  borderRadius: 3,
                   minHeight: 220,
                   display: "flex",
+                  border: "1px solid #e0e0e0",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                  },
                 }}
               >
                 {/* Left: Image */}
@@ -110,6 +128,7 @@ const Enhancement = () => {
                     width: "45%",
                     borderRadius: 2,
                     objectFit: "cover",
+                    border: "1px solid #e0e0e0",
                   }}
                 />
 
@@ -124,13 +143,13 @@ const Enhancement = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant='h6' fontWeight='bold' gutterBottom>
-                      Would you like to upgrade to a room Chamber King City
-                      View?
+                    <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+                      Upgrade to Chamber King City View
                     </Typography>
                     <Typography
                       variant='body2'
                       color='text.secondary'
+                      sx={{ lineHeight: 1.7 }}
                       paragraph
                     >
                       Upgrade your Chamber King to our Chamber King City View
@@ -141,10 +160,15 @@ const Enhancement = () => {
                     </Typography>
                     <Link
                       href='#'
-                      underline='always'
-                      sx={{ cursor: "pointer" }}
+                      underline='hover'
+                      sx={{ 
+                        cursor: "pointer",
+                        color: "#1976d2",
+                        fontWeight: 600,
+                        fontSize: "0.875rem",
+                      }}
                     >
-                      Read more
+                      Read more →
                     </Link>
                   </Box>
 
@@ -157,15 +181,29 @@ const Enhancement = () => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <Typography variant='subtitle1' fontWeight='bold'>
-                      +$47 per night
-                    </Typography>
+                    <Box>
+                      <Typography variant='caption' color='text.secondary' display='block'>
+                        Additional cost
+                      </Typography>
+                      <Typography variant='h6' sx={{ fontWeight: 700, color: "#1976d2" }}>
+                        +$47 per night
+                      </Typography>
+                    </Box>
                     <Button
                       variant='contained'
-                      color='primary'
                       onClick={() => toggleDrawer(true)}
+                      sx={{
+                        bgcolor: "#1976d2",
+                        textTransform: "none",
+                        px: 4,
+                        py: 1.5,
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        borderRadius: 2,
+                        "&:hover": { bgcolor: "#1565c0" },
+                      }}
                     >
-                      Upgrade
+                      Upgrade Room
                     </Button>
                   </Box>
                 </Box>
@@ -174,7 +212,10 @@ const Enhancement = () => {
 
             {/* Enhancements Picker (longer section) */}
             <Grid item>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
+                Additional Enhancements
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
                 {enhancementsList.map((item) => (
                   <Box
                     key={item.id}
@@ -182,10 +223,15 @@ const Enhancement = () => {
                       display: "flex",
                       alignItems: "center",
                       backgroundColor: "white",
-                      borderRadius: 2,
-                      boxShadow: 1,
-                      p: 2,
-                      gap: 2,
+                      borderRadius: 3,
+                      border: "1px solid #e0e0e0",
+                      p: 3,
+                      gap: 3,
+                      transition: "all 0.2s",
+                      "&:hover": {
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                        borderColor: "#1976d2",
+                      },
                     }}
                   >
                     {/* Image */}
@@ -194,54 +240,89 @@ const Enhancement = () => {
                       src={item.image}
                       alt={item.name}
                       sx={{
-                        width: 120,
-                        height: 80,
+                        width: 140,
+                        height: 100,
                         objectFit: "cover",
-                        borderRadius: 1,
+                        borderRadius: 2,
+                        border: "1px solid #e0e0e0",
                       }}
                     />
 
                     {/* Description */}
                     <Box
-                      sx={{ flex: 1, display: "flex", flexDirection: "column" }}
+                      sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1 }}
                     >
-                      <Typography variant='subtitle1' fontWeight='bold'>
+                      <Typography variant='h6' sx={{ fontWeight: 700, color: "#1a1a1a" }}>
                         {item.name}
                       </Typography>
                       <Typography
                         variant='body2'
                         color='text.secondary'
-                        sx={{ mb: 1 }}
+                        sx={{ lineHeight: 1.7 }}
                       >
                         {item.description}
                       </Typography>
-                      <Typography variant='subtitle2' fontWeight='bold'>
-                        +${item.price} per night
-                      </Typography>
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant='caption' color='text.secondary' display='block'>
+                          Additional cost
+                        </Typography>
+                        <Typography variant='h6' sx={{ fontWeight: 700, color: "#1976d2" }}>
+                          +${item.price} per night
+                        </Typography>
+                      </Box>
                     </Box>
 
-                    {/* Checkbox */}
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={selected.includes(item.id)}
-                          onChange={() => toggleEnhancement(item.id)}
-                        />
-                      }
-                      label='Add'
-                    />
+                    {/* Add Link */}
+                    <Link
+                      component="button"
+                      onClick={() => toggleEnhancement(item.id)}
+                      underline="always"
+                      sx={{
+                        cursor: "pointer",
+                        fontWeight: 500,
+                        fontSize: "1.1rem",
+                        transition: "all 0.2s",
+                        ...(selected.includes(item.id) ? {
+                          color: "#4caf50",
+                          "&:hover": {
+                            color: "#45a049",
+                          },
+                        } : {
+                          color: "#1976d2",
+                          "&:hover": {
+                            color: "#1565c0",
+                          },
+                        }),
+                      }}
+                    >
+                      {selected.includes(item.id) ? "✓ Added" : "+ Add"}
+                    </Link>
                   </Box>
                 ))}
 
                 <Button
                   variant='contained'
-                  color='primary'
-                  sx={{ alignSelf: "flex-end", mt: 2 }}
+                  sx={{ 
+                    alignSelf: "flex-end", 
+                    mt: 3,
+                    bgcolor: "#4caf50",
+                    textTransform: "none",
+                    px: 5,
+                    py: 1.5,
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    borderRadius: 2,
+                    boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
+                    "&:hover": { 
+                      bgcolor: "#45a049",
+                      boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
+                    },
+                  }}
                   onClick={() =>
-                    console.log("Selected enhancements:", selected)
+                    navigate("/confirmbooking")
                   }
                 >
-                  Confirm Enhancements
+                  Continue to Payment
                 </Button>
               </Box>
             </Grid>
