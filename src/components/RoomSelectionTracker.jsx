@@ -1,16 +1,14 @@
 import React from "react";
-import { Box, Paper, Typography, Button, LinearProgress, Chip, IconButton, Tooltip } from "@mui/material";
+import { Box, Paper, Typography, Button, LinearProgress, Chip } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 
 export default function RoomSelectionTracker({ 
   totalRooms, 
   currentRoomIndex, 
   selectedRooms,
-  onNavigateToEnhancements,
-  onRemoveRoom
+  onNavigateToEnhancements
 }) {
   const navigate = useNavigate();
   
@@ -29,11 +27,6 @@ export default function RoomSelectionTracker({
     }
   };
 
-  const handleRemoveRoom = (index) => {
-    if (onRemoveRoom) {
-      onRemoveRoom(index);
-    }
-  };
 
   // Don't show if no rooms selected
   if (selectedRooms.length === 0) {
@@ -103,12 +96,6 @@ export default function RoomSelectionTracker({
                 label={selectedRooms[index] ? `${selectedRooms[index].roomData.title} - ${selectedRooms[index].offerType}` : `Room ${index + 1}`}
                 size="small"
                 icon={selectedRooms[index] ? <CheckCircleIcon /> : undefined}
-                onDelete={selectedRooms[index] ? () => handleRemoveRoom(index) : undefined}
-                deleteIcon={
-                  <Tooltip title="Remove this room">
-                    <DeleteIcon />
-                  </Tooltip>
-                }
                 sx={{
                   fontWeight: 600,
                   bgcolor: selectedRooms[index] ? "#e8f5e9" : "#f5f5f5",
@@ -119,12 +106,6 @@ export default function RoomSelectionTracker({
                   maxWidth: 300,
                   "& .MuiChip-icon": {
                     color: "#4caf50",
-                  },
-                  "& .MuiChip-deleteIcon": {
-                    color: "#d32f2f",
-                    "&:hover": {
-                      color: "#b71c1c",
-                    },
                   },
                 }}
               />

@@ -11,17 +11,18 @@ import {
   Chip,
   IconButton,
   Badge,
+  Slider,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import BedIcon from "@mui/icons-material/Bed";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import LandscapeIcon from "@mui/icons-material/Landscape";
 import AccessibleIcon from "@mui/icons-material/Accessible";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-const bedOptions = ["Queen", "King", "Twin"];
 const viewOptions = ["City", "Sea", "Garden"];
-const accessibilityOptions = ["Wheelchair", "Visual", "Hearing"];
+const MIN_PRICE = 50;
+const MAX_PRICE = 500;
 
 export default function RoomFilterBar({ filters, setFilters }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -38,11 +39,26 @@ export default function RoomFilterBar({ filters, setFilters }) {
     });
   };
 
-  const handleReset = () => {
-    setFilters({ bedType: [], viewType: [], accessibility: [] });
+  const handleAccessibilityChange = () => {
+    setFilters((prev) => ({
+      ...prev,
+      accessibility: !prev.accessibility,
+    }));
   };
 
-  const totalFilters = filters.bedType.length + filters.viewType.length + filters.accessibility.length;
+  const handlePriceChange = (event, newValue) => {
+    setFilters((prev) => ({
+      ...prev,
+      priceRange: newValue,
+    }));
+  };
+
+  const handleReset = () => {
+    setFilters({ priceRange: [MIN_PRICE, MAX_PRICE], viewType: [], accessibility: false });
+  };
+
+  const priceFilterActive = filters.priceRange && (filters.priceRange[0] !== MIN_PRICE || filters.priceRange[1] !== MAX_PRICE);
+  const totalFilters = (priceFilterActive ? 1 : 0) + filters.viewType.length + (filters.accessibility ? 1 : 0);
   const filtersApplied = totalFilters > 0;
 
   return (
@@ -140,7 +156,7 @@ export default function RoomFilterBar({ filters, setFilters }) {
         {/* Content */}
         <Box sx={{ p: 3, bgcolor: "#fafafa", flexGrow: 1, overflowY: "auto" }}>
           <Stack spacing={3}>
-            {/* Bed Type */}
+            {/* Price Range */}
             <Box
               sx={{
                 bgcolor: "white",
@@ -159,49 +175,49 @@ export default function RoomFilterBar({ filters, setFilters }) {
                   fontSize: "1rem",
                 }}
               >
-                <BedIcon fontSize="small" sx={{ mr: 1, color: "#1976d2" }} />
-                Bed Type
+                <AttachMoneyIcon fontSize="small" sx={{ mr: 1, color: "#1976d2" }} />
+                Price Range (per night)
               </Typography>
-              <Stack spacing={0.5}>
-                {bedOptions.map((bed) => (
-                  <FormControlLabel
-                    key={bed}
-                    control={
-                      <Checkbox
-                        checked={filters.bedType.includes(bed)}
-                        onChange={() => handleFilterChange("bedType", bed)}
-                        sx={{
-                          color: "#bdbdbd",
-                          "&.Mui-checked": {
-                            color: "#1976d2",
-                          },
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography
-                        sx={{
-                          fontSize: "0.95rem",
-                          fontWeight: filters.bedType.includes(bed) ? 600 : 400,
-                          color: filters.bedType.includes(bed) ? "#1976d2" : "#424242",
-                        }}
-                      >
-                        {bed}
-                      </Typography>
-                    }
-                    sx={{
-                      ml: 0,
-                      py: 0.5,
-                      px: 1,
-                      borderRadius: 1,
-                      transition: "all 0.2s",
+              <Box sx={{ px: 1 }}>
+                <Slider
+                  value={filters.priceRange || [MIN_PRICE, MAX_PRICE]}
+                  onChange={handlePriceChange}
+                  valueLabelDisplay="auto"
+                  min={MIN_PRICE}
+                  max={MAX_PRICE}
+                  step={10}
+                  valueLabelFormat={(value) => `$${value}`}
+                  sx={{
+                    color: "#1976d2",
+                    "& .MuiSlider-thumb": {
+                      backgroundColor: "#1976d2",
+                      border: "2px solid #fff",
+                      boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)",
                       "&:hover": {
-                        bgcolor: "#f5f5f5",
+                        boxShadow: "0 4px 12px rgba(25, 118, 210, 0.4)",
                       },
-                    }}
-                  />
-                ))}
-              </Stack>
+                    },
+                    "& .MuiSlider-track": {
+                      backgroundColor: "#1976d2",
+                    },
+                    "& .MuiSlider-rail": {
+                      backgroundColor: "#e0e0e0",
+                    },
+                    "& .MuiSlider-valueLabel": {
+                      backgroundColor: "#1976d2",
+                      fontWeight: 600,
+                    },
+                  }}
+                />
+                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    ${filters.priceRange ? filters.priceRange[0] : MIN_PRICE}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    ${filters.priceRange ? filters.priceRange[1] : MAX_PRICE}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
 
             {/* View Type */}
@@ -269,31 +285,63 @@ export default function RoomFilterBar({ filters, setFilters }) {
             </Box>
 
             {/* Accessibility */}
-            {/* <Box>
+            <Box
+              sx={{
+                bgcolor: "white",
+                p: 2.5,
+                borderRadius: 2,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+              }}
+            >
               <Typography
-                sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}
+                sx={{
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 2,
+                  color: "#1a1a1a",
+                  fontSize: "1rem",
+                }}
               >
-                <AccessibleIcon
-                  fontSize="small"
-                  sx={{ mr: 1, color: "text.secondary" }}
-                />
+                <AccessibleIcon fontSize="small" sx={{ mr: 1, color: "#1976d2" }} />
                 Accessibility
               </Typography>
-              <Stack>
-                {accessibilityOptions.map((acc) => (
-                  <FormControlLabel
-                    key={acc}
-                    control={
-                      <Checkbox
-                        checked={filters.accessibility.includes(acc)}
-                        onChange={() => handleFilterChange("accessibility", acc)}
-                      />
-                    }
-                    label={acc}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={filters.accessibility || false}
+                    onChange={handleAccessibilityChange}
+                    sx={{
+                      color: "#bdbdbd",
+                      "&.Mui-checked": {
+                        color: "#1976d2",
+                      },
+                    }}
                   />
-                ))}
-              </Stack>
-            </Box> */}
+                }
+                label={
+                  <Typography
+                    sx={{
+                      fontSize: "0.95rem",
+                      fontWeight: filters.accessibility ? 600 : 400,
+                      color: filters.accessibility ? "#1976d2" : "#424242",
+                    }}
+                  >
+                    Accessibility Features Available
+                  </Typography>
+                }
+                sx={{
+                  ml: 0,
+                  py: 0.5,
+                  px: 1,
+                  borderRadius: 1,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    bgcolor: "#f5f5f5",
+                  },
+                }}
+              />
+            </Box>
           </Stack>
         </Box>
 

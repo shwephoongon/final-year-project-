@@ -73,9 +73,9 @@ const RoomList = () => {
   const [showOffers, setShowOffers] = useState(false);
   const [activeTab, setActiveTab] = useState("Deluxe");
   const [filters, setFilters] = useState({
-    bedType: [],
+    priceRange: [50, 500],
     viewType: [],
-    accessibility: [],
+    accessibility: false,
   });
   // New state for filters
   const [checkIn, setCheckIn] = useState("");
@@ -212,16 +212,27 @@ const RoomList = () => {
         }}
       >
         <Stack spacing={3} sx={{ width: "85%" }}>
-          {roomData[activeTab].map((room, idx) => (
-            <RoomCard 
-              key={idx}
-              room={room} 
-              idx={idx}
-              onRoomSelect={handleRoomSelect}
-              currentRoomIndex={currentRoomIndex}
-              totalRooms={totalRoomsToSelect}
-            />
-          ))}
+          {roomData[activeTab].map((room, idx) => {
+            // Check if this room is selected in ANY of the selected rooms
+            const selectedRoomIndex = selectedRooms.findIndex(
+              selectedRoom => selectedRoom && selectedRoom.roomData.title === room.title
+            );
+            const isSelected = selectedRoomIndex !== -1;
+            
+            return (
+              <RoomCard 
+                key={idx}
+                room={room} 
+                idx={idx}
+                onRoomSelect={handleRoomSelect}
+                onRemoveRoom={handleRemoveRoom}
+                currentRoomIndex={currentRoomIndex}
+                totalRooms={totalRoomsToSelect}
+                isSelected={isSelected}
+                selectedRoomIndex={selectedRoomIndex} // Pass the actual index of the selected room
+              />
+            );
+          })}
         </Stack>
       </Box>
       
@@ -231,7 +242,6 @@ const RoomList = () => {
         currentRoomIndex={currentRoomIndex}
         selectedRooms={selectedRooms}
         onNavigateToEnhancements={handleNavigateToEnhancements}
-        onRemoveRoom={handleRemoveRoom}
       />
     </Box>
   );

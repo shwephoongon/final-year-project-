@@ -197,7 +197,7 @@ function HomePage() {
       </Box>
 
       {/* Features Section */}
-      <Container maxWidth="lg" sx={{ mb: 8 }}>
+      <Container maxWidth="lg" sx={{ mb: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Typography variant="h3" sx={{ fontWeight: 700, textAlign: "center", mb: 1, color: "#1a1a1a" }}>
           Why Choose Us
         </Typography>
@@ -205,7 +205,7 @@ function HomePage() {
           Discover what makes Easy Hotel the perfect choice for your stay
         </Typography>
         
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ justifyContent: "center" }}>
           {[
             { icon: <StarIcon sx={{ fontSize: 40 }} />, title: "Premium Quality", desc: "5-star rated service and accommodations" },
             { icon: <CheckCircleIcon sx={{ fontSize: 40 }} />, title: "Best Price Guarantee", desc: "Lowest rates guaranteed or we match it" },
@@ -239,7 +239,7 @@ function HomePage() {
 
       {/* Amenities Section */}
       <Box sx={{ bgcolor: "#f8fafb", py: 8, mb: 8 }}>
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Typography variant="h3" sx={{ fontWeight: 700, textAlign: "center", mb: 1, color: "#1a1a1a" }}>
             Hotel Amenities
           </Typography>
@@ -247,7 +247,7 @@ function HomePage() {
             Everything you need for a comfortable and memorable stay
           </Typography>
           
-          <Grid container spacing={3}>
+          <Grid container spacing={3} sx={{ justifyContent: "center" }}>
             {[
               { icon: <RestaurantIcon />, title: "Fine Dining", desc: "Gourmet restaurant & room service" },
               { icon: <PoolIcon />, title: "Swimming Pool", desc: "Rooftop infinity pool with city views" },

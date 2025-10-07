@@ -18,8 +18,9 @@ import BathtubIcon from "@mui/icons-material/Bathtub";
 import KingBedIcon from "@mui/icons-material/KingBed";
 import CloseIcon from "@mui/icons-material/Close";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
-export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRooms }) {
+export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRooms, onRemoveRoom, isSelected = false, selectedRoomIndex = -1 }) {
   const [selectedBed, setSelectedBed] = useState("Queen");
   const [showOffers, setShowOffers] = useState(false);
   const [slide, setSlide] = useState(0);
@@ -56,14 +57,48 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
     <Paper
       elevation={0}
       sx={{
+        position: "relative",
         borderRadius: 3,
         backgroundColor: "#fff",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        border: "1px solid #e0e0e0",
+        border: isSelected ? "2px solid #4caf50" : "1px solid #e0e0e0",
+        boxShadow: isSelected ? "0 4px 20px rgba(76, 175, 80, 0.2)" : "none",
       }}
     >
+      {/* Remove Button - Only show if room is selected */}
+      {isSelected && (
+        <Button
+          variant="contained"
+          startIcon={<RemoveCircleOutlineIcon fontSize="small" />}
+          onClick={() => onRemoveRoom && onRemoveRoom(selectedRoomIndex)}
+          sx={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            zIndex: 10,
+            bgcolor: "rgba(97, 97, 97, 0.9)",
+            color: "white",
+            textTransform: "none",
+            fontWeight: 500,
+            fontSize: "0.8rem",
+            px: 1.5,
+            py: 0.75,
+            minWidth: "auto",
+            "&:hover": {
+              bgcolor: "rgba(66, 66, 66, 0.95)",
+              transform: "translateY(-1px)",
+            },
+            transition: "all 0.2s ease-in-out",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+            borderRadius: 1.5,
+          }}
+        >
+          Remove
+        </Button>
+      )}
+
       {/* Top Section: Image and Content Side by Side */}
       <Box sx={{ display: "flex", flexDirection: "row" }}>
         {/* Left: Image Slider */}
