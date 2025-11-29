@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Box,
@@ -16,34 +16,7 @@ import {
 import UpgradeDrawer from "../components/UpgradeDrawer";
 import BookingDetails from "../components/BookingDetails";
 import { useNavigate } from "react-router-dom";
-
-
-const enhancementsList = [
-  {
-    id: 1,
-    name: "Spa Access",
-    description:
-      "Relax and rejuvenate with full access to our spa facilities including sauna, massage, and hot tub.",
-    price: 50,
-    image: "/spa.jpg",
-  },
-  {
-    id: 2,
-    name: "Breakfast Buffet",
-    description:
-      "Enjoy a gourmet breakfast buffet with fresh pastries, eggs, coffee, and seasonal fruits.",
-    price: 20,
-    image: "/spa.jpg",
-  },
-  {
-    id: 3,
-    name: "Airport Pickup",
-    description:
-      "Private car service from the airport to the hotel in comfort and style.",
-    price: 35,
-    image: "/spa.jpg",
-  },
-];
+import { supabase } from "../supabaseclient";
 
 const Enhancement = () => {
   const [selected, setSelected] = useState([]);
@@ -62,6 +35,38 @@ const Enhancement = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const toggleDrawer = (status) => setDrawerOpen(status);
   const navigate = useNavigate();
+  const [enhancements, setEnhancements] = useState([]);
+     const stored = localStorage.getItem("selectedRooms");
+    const searchData = localStorage.getItem("searchdata");
+
+  useEffect(() => {
+    fetchEnhancements();
+  }, []);
+
+  // useEffect(() => {
+  //   const stored = localStorage.getItem("selectedRooms");
+  //   const storedsearch = localStorage.getItem("searchdata");
+  //   if (stored) {
+  //     console.log("Selected rooms:", JSON.parse(stored));
+  //     console.log("Search Data", JSON.parse(storedsearch));
+  //   } else {
+  //     console.log("No selected rooms found.");
+  //   }
+  // }, []);
+
+  const fetchEnhancements = async () => {
+    const { data, error } = await supabase
+      .from("enhancements")
+      .select("*")
+      .order("enhanceid");
+
+    if (error) {
+      console.error("Fetch error:", error);
+      return;
+    }
+
+    setEnhancements(data);
+  };
 
   const totalPrice = bookedRooms.reduce(
     (acc, room) => acc + room.rate * room.quantity * stayDetails.nights,
@@ -85,14 +90,17 @@ const Enhancement = () => {
     >
       {/* Page Header */}
       <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+        <Typography
+          variant='h4'
+          sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
+        >
           Enhance Your Stay
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant='body1' color='text.secondary'>
           Add special touches to make your experience unforgettable
         </Typography>
       </Container>
-      
+
       <Container maxWidth={false} sx={{ width: "90%" }}>
         <Grid container spacing={2}>
           {/* ===== First Column (70%) ===== */}
@@ -143,7 +151,10 @@ const Enhancement = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+                    <Typography
+                      variant='h5'
+                      sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
+                    >
                       Upgrade to Chamber King City View
                     </Typography>
                     <Typography
@@ -161,7 +172,7 @@ const Enhancement = () => {
                     <Link
                       href='#'
                       underline='hover'
-                      sx={{ 
+                      sx={{
                         cursor: "pointer",
                         color: "#1976d2",
                         fontWeight: 600,
@@ -182,10 +193,17 @@ const Enhancement = () => {
                     }}
                   >
                     <Box>
-                      <Typography variant='caption' color='text.secondary' display='block'>
+                      <Typography
+                        variant='caption'
+                        color='text.secondary'
+                        display='block'
+                      >
                         Additional cost
                       </Typography>
-                      <Typography variant='h6' sx={{ fontWeight: 700, color: "#1976d2" }}>
+                      <Typography
+                        variant='h6'
+                        sx={{ fontWeight: 700, color: "#1976d2" }}
+                      >
                         +$47 per night
                       </Typography>
                     </Box>
@@ -212,11 +230,14 @@ const Enhancement = () => {
 
             {/* Enhancements Picker (longer section) */}
             <Grid item>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
+              <Typography
+                variant='h5'
+                sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}
+              >
                 Additional Enhancements
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-                {enhancementsList.map((item) => (
+                {enhancements.map((item) => (
                   <Box
                     key={item.id}
                     sx={{
@@ -237,7 +258,7 @@ const Enhancement = () => {
                     {/* Image */}
                     <Box
                       component='img'
-                      src={item.image}
+                      src={"/spa.jpg"}
                       alt={item.name}
                       sx={{
                         width: 140,
@@ -250,9 +271,17 @@ const Enhancement = () => {
 
                     {/* Description */}
                     <Box
-                      sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1 }}
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1,
+                      }}
                     >
-                      <Typography variant='h6' sx={{ fontWeight: 700, color: "#1a1a1a" }}>
+                      <Typography
+                        variant='h6'
+                        sx={{ fontWeight: 700, color: "#1a1a1a" }}
+                      >
                         {item.name}
                       </Typography>
                       <Typography
@@ -263,10 +292,17 @@ const Enhancement = () => {
                         {item.description}
                       </Typography>
                       <Box sx={{ mt: 1 }}>
-                        <Typography variant='caption' color='text.secondary' display='block'>
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          display='block'
+                        >
                           Additional cost
                         </Typography>
-                        <Typography variant='h6' sx={{ fontWeight: 700, color: "#1976d2" }}>
+                        <Typography
+                          variant='h6'
+                          sx={{ fontWeight: 700, color: "#1976d2" }}
+                        >
                           +${item.price} per night
                         </Typography>
                       </Box>
@@ -274,25 +310,27 @@ const Enhancement = () => {
 
                     {/* Add Link */}
                     <Link
-                      component="button"
+                      component='button'
                       onClick={() => toggleEnhancement(item.id)}
-                      underline="always"
+                      underline='always'
                       sx={{
                         cursor: "pointer",
                         fontWeight: 500,
                         fontSize: "1.1rem",
                         transition: "all 0.2s",
-                        ...(selected.includes(item.id) ? {
-                          color: "#4caf50",
-                          "&:hover": {
-                            color: "#45a049",
-                          },
-                        } : {
-                          color: "#1976d2",
-                          "&:hover": {
-                            color: "#1565c0",
-                          },
-                        }),
+                        ...(selected.includes(item.id)
+                          ? {
+                              color: "#4caf50",
+                              "&:hover": {
+                                color: "#45a049",
+                              },
+                            }
+                          : {
+                              color: "#1976d2",
+                              "&:hover": {
+                                color: "#1565c0",
+                              },
+                            }),
                       }}
                     >
                       {selected.includes(item.id) ? "✓ Added" : "+ Add"}
@@ -302,8 +340,8 @@ const Enhancement = () => {
 
                 <Button
                   variant='contained'
-                  sx={{ 
-                    alignSelf: "flex-end", 
+                  sx={{
+                    alignSelf: "flex-end",
                     mt: 3,
                     bgcolor: "#4caf50",
                     textTransform: "none",
@@ -313,14 +351,12 @@ const Enhancement = () => {
                     fontSize: "1rem",
                     borderRadius: 2,
                     boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
-                    "&:hover": { 
+                    "&:hover": {
                       bgcolor: "#45a049",
                       boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
                     },
                   }}
-                  onClick={() =>
-                    navigate("/confirmbooking")
-                  }
+                  onClick={() => navigate("/confirmbooking")}
                 >
                   Continue to Payment
                 </Button>
@@ -338,8 +374,8 @@ const Enhancement = () => {
           >
             <Grid item sx={{ flex: 8 }}>
               <BookingDetails
-                stayDetails={stayDetails}
-                bookedRooms={bookedRooms}
+                stayDetails={searchData}
+                bookedRooms={stored}
                 totalPrice={totalPrice}
               />
             </Grid>

@@ -7,25 +7,33 @@ import {
   Button,
   FormControlLabel,
   Checkbox,
+  Divider,
 } from "@mui/material";
 import BookingDetails from "../components/BookingDetails";
+import { useState } from "react";
+import { supabase } from "../supabaseclient";
 
 const ConfirmBooking = () => {
-  const stayDetails = {
-    checkIn: "2025-10-01",
-    checkOut: "2025-10-05",
-    nights: 4,
-  };
-
-  const bookedRooms = [
-    { name: "Chamber King City View", rate: 150, quantity: 1 },
-    { name: "Deluxe Queen Room", rate: 120, quantity: 2 },
-  ];
-
-  const totalPrice = bookedRooms.reduce(
-    (acc, room) => acc + room.rate * room.quantity * stayDetails.nights,
+  const bookedRooms = JSON.parse(localStorage.getItem("selectedRooms")) || [];
+  let searchDataGet = JSON.parse(localStorage.getItem("searchdata")) || [];
+  const searchData = searchDataGet[0];
+  //const bookedRooms = storedRooms[0];
+  const totalRate = bookedRooms.reduce(
+    (sum, room) => sum + (room.offerType?.rateprice || 0),
     0
   );
+  const [guest, setGuest] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    streetnumber: "",
+    streetname: "",
+    city: "",
+    state: "",
+    country: "",
+  });
+
   const textFieldStyle = {
     flex: 1,
     "& .MuiOutlinedInput-root": {
@@ -45,6 +53,83 @@ const ConfirmBooking = () => {
     },
   };
 
+  const handleConfirmBooking = async () => {
+    try {
+      // -----------------------------------------
+      // 1. Insert guest
+      // -----------------------------------------
+      const { data: guestData, error: guestError } = await supabase
+        .from("guest")
+        .insert([
+          {
+            firstname: guest.firstname,
+            lastname: guest.lastname,
+            email: guest.email,
+            phone: guest.phone,
+            streetnumber: guest.streetnumber,
+            streetanme: guest.streetname,
+            city: guest.city,
+            state: guest.state,
+            country: guest.country,
+          },
+        ])
+        .select("guestid")
+        .single();
+
+      if (guestError) throw guestError;
+
+      const guestid = guestData.guestid;
+
+      const totalRoomAmount = bookedRooms.reduce((sum, room) => {
+        const rate = room.offerType?.rateprice || 0;
+        const nights = room.offerType?.nights || 1;
+        return sum + rate * nights;
+      }, 0);
+
+      // -----------------------------------------
+      // 2. Insert bookinghead
+      // -----------------------------------------
+      const { data: bookingHeadData, error: bookingHeadError } = await supabase
+        .from("bookinghead")
+        .insert([
+          {
+            guestid: guestid,
+            checkin_date: searchData.fromDate,
+            checkout_date: searchData.toDate,
+            total_room_amount: totalRoomAmount,
+            total_enhancement_amount: 0,
+            payment_status: "Pending",
+            created_at: new Date(),
+          },
+        ])
+        .select("bookingid")
+        .single();
+
+      if (bookingHeadError) throw bookingHeadError;
+
+      const bookingid = bookingHeadData.bookingid;
+
+      const roomDetailsPayload = bookedRooms.map((room) => ({
+        bookingid: bookingid,
+        roomtypeid: room.roomData.roomtypeid, // TODO: map your real roomtypeid
+        rate_per_night: room.offerType.rateprice,
+        nights: 1,
+        //room_total: room.rate * room.quantity * stayDetails.nights,
+      }));
+
+      const { error: detailError } = await supabase
+        .from("bookingroomdetail")
+        .insert(roomDetailsPayload);
+
+      if (detailError) throw detailError;
+
+      alert("✔ Booking Confirmed Successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error: " + err.message);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -57,14 +142,17 @@ const ConfirmBooking = () => {
     >
       {/* Page Header */}
       <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}>
+        <Typography
+          variant='h4'
+          sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
+        >
           Confirm Your Booking
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant='body1' color='text.secondary'>
           Please review your details and complete your reservation
         </Typography>
       </Container>
-      
+
       <Container maxWidth={false} sx={{ width: "90%" }}>
         {/* ===== Guest Information Grid ===== */}
 
@@ -87,95 +175,112 @@ const ConfirmBooking = () => {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
-                <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
+                <Typography
+                  variant='h5'
+                  sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}
+                >
                   Guest Information
                 </Typography>
 
-                {/* First + Last Name */}
-                <Box display='flex' mb={3}>
+                <Divider sx={{ mb: 3 }} />
+
+                {/* First Name + Last Name */}
+                <Box display='flex' mb={2}>
                   <TextField
-                    label='First Name *'
-                    variant='outlined'
+                    label='First Name'
+                    value={guest.firstName}
+                    onChange={(e) =>
+                      setGuest({ ...guest, firstName: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
-                    label='Last Name *'
-                    variant='outlined'
+                    label='Last Name'
+                    value={guest.lastName}
+                    onChange={(e) =>
+                      setGuest({ ...guest, lastName: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
 
                 {/* Email + Phone */}
-                <Box display='flex' mb={3}>
+                <Box display='flex' mb={2}>
                   <TextField
-                    label='Email *'
-                    type='email'
-                    variant='outlined'
+                    label='Email'
+                    value={guest.email}
+                    onChange={(e) =>
+                      setGuest({ ...guest, email: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
-                    label='Phone *'
-                    type='tel'
-                    variant='outlined'
+                    label='Phone'
+                    value={guest.phone}
+                    onChange={(e) =>
+                      setGuest({ ...guest, phone: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
 
-                {/* Address (Full Row) */}
-                <Box mb={3}>
+                {/* Address (full width) */}
+                <Box mb={2}>
                   <TextField
                     fullWidth
-                    label='Address *'
-                    variant='outlined'
+                    label='Address'
+                    value={guest.address}
+                    onChange={(e) =>
+                      setGuest({ ...guest, address: e.target.value })
+                    }
                     size='small'
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
-                        "& fieldset": {
-                          borderColor: "#e0e0e0",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#1976d2",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#1976d2",
-                        },
-                      },
-                    }}
+                    sx={textFieldStyle}
                   />
                 </Box>
 
-                {/* Zip + City */}
-                <Box display='flex' mb={3}>
+                {/* City + Zip */}
+                <Box display='flex' mb={2}>
                   <TextField
-                    label='Zip Code *'
-                    variant='outlined'
+                    label='City'
+                    value={guest.city}
+                    onChange={(e) =>
+                      setGuest({ ...guest, city: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
-                    label='City *'
-                    variant='outlined'
+                    label='Zip Code'
+                    value={guest.zip}
+                    onChange={(e) =>
+                      setGuest({ ...guest, zip: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                 </Box>
 
                 {/* State + Country */}
-                <Box display='flex'>
+                <Box display='flex' mb={1}>
                   <TextField
-                    label='State *'
-                    variant='outlined'
+                    label='State'
+                    value={guest.state}
+                    onChange={(e) =>
+                      setGuest({ ...guest, state: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
-                    label='Country *'
-                    variant='outlined'
+                    label='Country'
+                    value={guest.country}
+                    onChange={(e) =>
+                      setGuest({ ...guest, country: e.target.value })
+                    }
                     size='small'
                     sx={textFieldStyle}
                   />
@@ -196,7 +301,10 @@ const ConfirmBooking = () => {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
-                <Typography variant='h5' sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}>
+                <Typography
+                  variant='h5'
+                  sx={{ fontWeight: 700, color: "#1a1a1a", mb: 3 }}
+                >
                   Payment Details
                 </Typography>
 
@@ -243,16 +351,18 @@ const ConfirmBooking = () => {
 
             {/* Checkboxes Box */}
             <Grid item>
-              <Box sx={{ 
-                backgroundColor: "white", 
-                p: 3, 
-                borderRadius: 3,
-                border: "1px solid #e0e0e0",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}>
+              <Box
+                sx={{
+                  backgroundColor: "white",
+                  p: 3,
+                  borderRadius: 3,
+                  border: "1px solid #e0e0e0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                }}
+              >
                 <FormControlLabel
                   control={
-                    <Checkbox 
+                    <Checkbox
                       sx={{
                         color: "#bdbdbd",
                         "&.Mui-checked": {
@@ -262,15 +372,16 @@ const ConfirmBooking = () => {
                     />
                   }
                   label={
-                    <Typography variant="body2">
-                      I have understood and agree to the Booking Conditions and agree to the Privacy Policy
+                    <Typography variant='body2'>
+                      I have understood and agree to the Booking Conditions and
+                      agree to the Privacy Policy
                     </Typography>
                   }
                   sx={{ mb: 1 }}
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox 
+                    <Checkbox
                       sx={{
                         color: "#bdbdbd",
                         "&.Mui-checked": {
@@ -280,7 +391,7 @@ const ConfirmBooking = () => {
                     />
                   }
                   label={
-                    <Typography variant="body2">
+                    <Typography variant='body2'>
                       Please email me special offers and updates
                     </Typography>
                   }
@@ -290,9 +401,10 @@ const ConfirmBooking = () => {
             {/* Confirm Booking Button */}
             <Grid item>
               <Box display='flex' justifyContent='center' mt={2}>
-                <Button 
-                  variant='contained' 
+                <Button
+                  variant='contained'
                   size='large'
+                  onClick={handleConfirmBooking}
                   sx={{
                     bgcolor: "#4caf50",
                     textTransform: "none",
@@ -302,7 +414,7 @@ const ConfirmBooking = () => {
                     fontSize: "1.1rem",
                     borderRadius: 2,
                     boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
-                    "&:hover": { 
+                    "&:hover": {
                       bgcolor: "#45a049",
                       boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
                       transform: "translateY(-2px)",
@@ -325,11 +437,7 @@ const ConfirmBooking = () => {
             sx={{ width: "35%" }}
           >
             <Grid item sx={{ flex: 8 }}>
-              <BookingDetails
-                stayDetails={stayDetails}
-                bookedRooms={bookedRooms}
-                totalPrice={totalPrice}
-              />
+              <BookingDetails />
             </Grid>
           </Grid>
         </Grid>

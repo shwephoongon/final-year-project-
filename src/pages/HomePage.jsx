@@ -33,7 +33,6 @@ function HomePage() {
   const [toDate, setToDate] = useState(addDays(new Date(), 1)); // ✅ default tomorrow
   const [error, setError] = useState(""); // for validation messages
   const navigate = useNavigate();
-
   const onPressBooking = () => {
     // Reset error first
     setError("");
@@ -48,12 +47,30 @@ function HomePage() {
       return;
     }
 
-    // All good, navigate
+    // Prepare the selected room data (or booking info)
+    const selectedRoomData = {
+      location,
+      fromDate: format(fromDate, "yyyy-MM-dd"),
+      toDate: format(toDate, "yyyy-MM-dd"),
+      nights: Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)), // calculate nights
+    };
+    console.log("searchdata", selectedRoomData);
+    // Save it to localStorage
+    localStorage.setItem("searchdata", JSON.stringify(selectedRoomData));
+
+    // Navigate to RoomList page
     navigate("/RoomList");
   };
 
   return (
-    <Box sx={{ width: "100%", minHeight: "100vh", overflow: "auto", bgcolor: "#ffffff" }}>
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        overflow: "auto",
+        bgcolor: "#ffffff",
+      }}
+    >
       {/* ✅ Filter Bar on top, outside the image */}
       <Box
         sx={{
@@ -164,7 +181,7 @@ function HomePage() {
         }}
       >
         <Box
-          component="img"
+          component='img'
           src='/homepic.webp'
           alt='Hotel background'
           sx={{
@@ -187,48 +204,76 @@ function HomePage() {
             textShadow: "0 2px 8px rgba(0,0,0,0.6)",
           }}
         >
-          <Typography variant="h2" sx={{ fontWeight: 800, mb: 1 }}>
+          <Typography variant='h2' sx={{ fontWeight: 800, mb: 1 }}>
             Welcome to Easy Hotel
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 400 }}>
+          <Typography variant='h5' sx={{ fontWeight: 400 }}>
             Experience luxury and comfort in the heart of the city
           </Typography>
         </Box>
       </Box>
 
       {/* Features Section */}
-      <Container maxWidth="lg" sx={{ mb: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="h3" sx={{ fontWeight: 700, textAlign: "center", mb: 1, color: "#1a1a1a" }}>
+      <Container
+        maxWidth='lg'
+        sx={{
+          mb: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant='h3'
+          sx={{ fontWeight: 700, textAlign: "center", mb: 1, color: "#1a1a1a" }}
+        >
           Why Choose Us
         </Typography>
-        <Typography variant="body1" sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}>
+        <Typography
+          variant='body1'
+          sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}
+        >
           Discover what makes Easy Hotel the perfect choice for your stay
         </Typography>
-        
+
         <Grid container spacing={3} sx={{ justifyContent: "center" }}>
           {[
-            { icon: <StarIcon sx={{ fontSize: 40 }} />, title: "Premium Quality", desc: "5-star rated service and accommodations" },
-            { icon: <CheckCircleIcon sx={{ fontSize: 40 }} />, title: "Best Price Guarantee", desc: "Lowest rates guaranteed or we match it" },
-            { icon: <WifiIcon sx={{ fontSize: 40 }} />, title: "Free High-Speed WiFi", desc: "Stay connected throughout your visit" },
+            {
+              icon: <StarIcon sx={{ fontSize: 40 }} />,
+              title: "Premium Quality",
+              desc: "5-star rated service and accommodations",
+            },
+            {
+              icon: <CheckCircleIcon sx={{ fontSize: 40 }} />,
+              title: "Best Price Guarantee",
+              desc: "Lowest rates guaranteed or we match it",
+            },
+            {
+              icon: <WifiIcon sx={{ fontSize: 40 }} />,
+              title: "Free High-Speed WiFi",
+              desc: "Stay connected throughout your visit",
+            },
           ].map((item, idx) => (
             <Grid item xs={12} md={4} key={idx}>
-              <Card sx={{ 
-                height: "100%", 
-                textAlign: "center", 
-                p: 3,
-                border: "1px solid #e0e0e0",
-                borderRadius: 3,
-                transition: "all 0.3s",
-                "&:hover": {
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                  transform: "translateY(-8px)",
-                },
-              }}>
+              <Card
+                sx={{
+                  height: "100%",
+                  textAlign: "center",
+                  p: 3,
+                  border: "1px solid #e0e0e0",
+                  borderRadius: 3,
+                  transition: "all 0.3s",
+                  "&:hover": {
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                    transform: "translateY(-8px)",
+                  },
+                }}
+              >
                 <Box sx={{ color: "#1976d2", mb: 2 }}>{item.icon}</Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
                   {item.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant='body2' color='text.secondary'>
                   {item.desc}
                 </Typography>
               </Card>
@@ -239,44 +284,90 @@ function HomePage() {
 
       {/* Amenities Section */}
       <Box sx={{ bgcolor: "#f8fafb", py: 8, mb: 8 }}>
-        <Container maxWidth="lg" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Typography variant="h3" sx={{ fontWeight: 700, textAlign: "center", mb: 1, color: "#1a1a1a" }}>
+        <Container
+          maxWidth='lg'
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant='h3'
+            sx={{
+              fontWeight: 700,
+              textAlign: "center",
+              mb: 1,
+              color: "#1a1a1a",
+            }}
+          >
             Hotel Amenities
           </Typography>
-          <Typography variant="body1" sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}>
+          <Typography
+            variant='body1'
+            sx={{ textAlign: "center", color: "text.secondary", mb: 5 }}
+          >
             Everything you need for a comfortable and memorable stay
           </Typography>
-          
+
           <Grid container spacing={3} sx={{ justifyContent: "center" }}>
             {[
-              { icon: <RestaurantIcon />, title: "Fine Dining", desc: "Gourmet restaurant & room service" },
-              { icon: <PoolIcon />, title: "Swimming Pool", desc: "Rooftop infinity pool with city views" },
-              { icon: <FitnessCenterIcon />, title: "Fitness Center", desc: "24/7 state-of-the-art gym" },
-              { icon: <SpaIcon />, title: "Spa & Wellness", desc: "Full-service spa and massage" },
-              { icon: <LocalParkingIcon />, title: "Free Parking", desc: "Complimentary valet parking" },
-              { icon: <WifiIcon />, title: "Business Center", desc: "Meeting rooms and workspaces" },
+              {
+                icon: <RestaurantIcon />,
+                title: "Fine Dining",
+                desc: "Gourmet restaurant & room service",
+              },
+              {
+                icon: <PoolIcon />,
+                title: "Swimming Pool",
+                desc: "Rooftop infinity pool with city views",
+              },
+              {
+                icon: <FitnessCenterIcon />,
+                title: "Fitness Center",
+                desc: "24/7 state-of-the-art gym",
+              },
+              {
+                icon: <SpaIcon />,
+                title: "Spa & Wellness",
+                desc: "Full-service spa and massage",
+              },
+              {
+                icon: <LocalParkingIcon />,
+                title: "Free Parking",
+                desc: "Complimentary valet parking",
+              },
+              {
+                icon: <WifiIcon />,
+                title: "Business Center",
+                desc: "Meeting rooms and workspaces",
+              },
             ].map((amenity, idx) => (
               <Grid item xs={12} sm={6} md={4} key={idx}>
-                <Box sx={{ 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: 2,
-                  p: 2.5,
-                  bgcolor: "white",
-                  borderRadius: 2,
-                  border: "1px solid #e0e0e0",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    borderColor: "#1976d2",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                  },
-                }}>
-                  <Box sx={{ color: "#1976d2", fontSize: 32 }}>{amenity.icon}</Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    p: 2.5,
+                    bgcolor: "white",
+                    borderRadius: 2,
+                    border: "1px solid #e0e0e0",
+                    transition: "all 0.2s",
+                    "&:hover": {
+                      borderColor: "#1976d2",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    },
+                  }}
+                >
+                  <Box sx={{ color: "#1976d2", fontSize: 32 }}>
+                    {amenity.icon}
+                  </Box>
                   <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
                       {amenity.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant='body2' color='text.secondary'>
                       {amenity.desc}
                     </Typography>
                   </Box>
@@ -288,23 +379,26 @@ function HomePage() {
       </Box>
 
       {/* Call to Action */}
-      <Container maxWidth="md" sx={{ mb: 8, textAlign: "center" }}>
-        <Box sx={{ 
-          p: 6, 
-          bgcolor: "#1976d2", 
-          borderRadius: 3,
-          color: "white",
-          boxShadow: "0 8px 24px rgba(25, 118, 210, 0.3)",
-        }}>
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+      <Container maxWidth='md' sx={{ mb: 8, textAlign: "center" }}>
+        <Box
+          sx={{
+            p: 6,
+            bgcolor: "#1976d2",
+            borderRadius: 3,
+            color: "white",
+            boxShadow: "0 8px 24px rgba(25, 118, 210, 0.3)",
+          }}
+        >
+          <Typography variant='h4' sx={{ fontWeight: 700, mb: 2 }}>
             Ready to Book Your Stay?
           </Typography>
-          <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-            Experience unparalleled comfort and hospitality. Book now and enjoy exclusive rates!
+          <Typography variant='body1' sx={{ mb: 3, opacity: 0.9 }}>
+            Experience unparalleled comfort and hospitality. Book now and enjoy
+            exclusive rates!
           </Typography>
-          <Button 
-            variant="contained" 
-            size="large"
+          <Button
+            variant='contained'
+            size='large'
             onClick={() => navigate("/RoomList")}
             sx={{
               bgcolor: "white",

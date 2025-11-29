@@ -11,7 +11,7 @@ export default function RoomSelectionTracker({
   onNavigateToEnhancements
 }) {
   const navigate = useNavigate();
-  
+  console.log('selectedrooms',selectedRooms)
   // Calculate progress
   const progress = (selectedRooms.length / totalRooms) * 100;
   const allRoomsSelected = selectedRooms.length === totalRooms;
@@ -93,7 +93,7 @@ export default function RoomSelectionTracker({
             {Array.from({ length: totalRooms }).map((_, index) => (
               <Chip
                 key={index}
-                label={selectedRooms[index] ? `${selectedRooms[index].roomData.title} - ${selectedRooms[index].offerType}` : `Room ${index + 1}`}
+                label={selectedRooms[index] ? `${selectedRooms[index].roomData.roomtypename} - ${selectedRooms[index].offerType.ratename}` : `Room ${index + 1}`}
                 size="small"
                 icon={selectedRooms[index] ? <CheckCircleIcon /> : undefined}
                 sx={{

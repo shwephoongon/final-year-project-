@@ -52,7 +52,7 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
     { key: "Breakfast", label: "Breakfast", icon: <FreeBreakfastIcon fontSize="inherit" color="primary" /> },
     { key: "Private Bath", label: "Private Bath", icon: <BathtubIcon fontSize="inherit" color="primary" /> },
   ];
-
+console.log(room)
   return (
     <Paper
       elevation={0}
@@ -165,11 +165,11 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
         <Box sx={{ flex: 1, p: 4, display: "flex", flexDirection: "column" }}>
           {/* Header Section */}
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#1a1a1a" }}>
-            {room.title}
+            {room.roomtypename}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            {room.size}
-          </Typography>
+          {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+            {room.size_sqft} sqft
+          </Typography> */}
 
           {/* Bed type selector */}
           <Stack direction="row" spacing={1.5} mb={3}>
@@ -210,14 +210,20 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
                 Amenities
               </Typography>
               <Stack spacing={1.5}>
-                {amenitiesList.map((amenity) => (
+                {/* {amenitiesList.map((amenity) => (
                   <Stack key={amenity.key} direction="row" spacing={1.5} alignItems="center">
                     <Box sx={{ color: "#1976d2", display: "flex" }}>{amenity.icon}</Box>
                     <Typography variant="body2" sx={{ fontSize: "0.875rem", color: "#424242" }}>
                       {amenity.label}
                     </Typography>
                   </Stack>
-                ))}
+                ))} */}
+                 <Stack direction="row" spacing={1.5} alignItems="center">
+                    {/* <Box sx={{ color: "#1976d2", display: "flex" }}>{amenity.icon}</Box> */}
+                    <Typography variant="body2" sx={{ fontSize: "0.875rem", color: "#424242" }}>
+                      {room.amenities}
+                    </Typography>
+                  </Stack>
               </Stack>
             </Box>
 
@@ -239,7 +245,7 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
                       Size:
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
-                      {room.size}
+                      {room.size_sqft}
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="center">
@@ -259,7 +265,7 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
                     Average Rate
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: "#1976d2" }}>
-                    ${Math.round((room.price + (room.price + 25) + (room.price + 50) + (room.price + 75)) / 4)}
+                    ${room.base_price}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     per night
@@ -269,7 +275,7 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => handleBookRoom("Average Rate", Math.round((room.price + (room.price + 25) + (room.price + 50) + (room.price + 75)) / 4))}
+                  onClick={() => handleBookRoom("Base Rate", room.base_price)}
                   sx={{
                     backgroundColor: "#1976d2",
                     py: 1.5,
@@ -317,331 +323,93 @@ export default function RoomCard({ room, onRoomSelect, currentRoomIndex, totalRo
             Available Offers
           </Typography>
           <Stack spacing={2.5}>
-            {/* Room Only Offer */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 3,
-                borderRadius: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transition: "all 0.2s",
-                "&:hover": { borderColor: "#1976d2", boxShadow: 2 },
-              }}
-            >
-              <Box sx={{ flex: 1 }}>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                      Room Only
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      Best flexible rate with free cancellation
-                    </Typography>
-                    <Stack direction="row" spacing={3}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Cancellation
+            {room.viewoffers.map((rt, index) => (
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 3,
+                  borderRadius: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  transition: "all 0.2s",
+                  "&:hover": { borderColor: "#1976d2", boxShadow: 2 },
+                }}
+              >
+                <Box sx={{ flex: 1 }}>
+                  <Stack direction="row" spacing={2} alignItems="flex-start">
+                    <Box sx={{ flex: 1 }}>
+                      <Stack direction="row" spacing={1} alignItems="center" mb={0.5}>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {rt.ratename}
                         </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Free until 24h
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Payment
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Pay at hotel
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Meals
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Not included
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-                  <Box sx={{ textAlign: "right", minWidth: 180 }}>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      Total per night
-                    </Typography>
-                    <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}>
-                      ${room.price}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => handleBookRoom("Room Only", room.price)}
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        textTransform: "none",
-                        py: 1.2,
-                        fontWeight: 600,
-                        "&:hover": { backgroundColor: "#1565c0" },
-                      }}
-                    >
-                      Book Now
-                    </Button>
-                  </Box>
-                </Stack>
-              </Box>
-            </Paper>
-
-            {/* Bed & Breakfast Offer */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 3,
-                borderRadius: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transition: "all 0.2s",
-                "&:hover": { borderColor: "#1976d2", boxShadow: 2 },
-              }}
-            >
-              <Box sx={{ flex: 1 }}>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                  <Box sx={{ flex: 1 }}>
-                    <Stack direction="row" spacing={1} alignItems="center" mb={0.5}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Bed & Breakfast
+                        <Chip
+                          label="Best Value"
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: "0.7rem",
+                            backgroundColor: "#ff9800",
+                            color: "white",
+                            fontWeight: 600,
+                          }}
+                        />
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                        {rt.description}
                       </Typography>
-                      <Chip
-                        label="Popular"
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: "0.7rem",
-                          backgroundColor: "#4caf50",
-                          color: "white",
-                          fontWeight: 600,
-                        }}
-                      />
-                    </Stack>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      Includes daily breakfast for 2 guests at our restaurant
-                    </Typography>
-                    <Stack direction="row" spacing={3}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Cancellation
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Free until 48h
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Payment
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Prepayment required
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Meals
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Breakfast included
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-                  <Box sx={{ textAlign: "right", minWidth: 180 }}>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      Total per night
-                    </Typography>
-                    <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}>
-                      ${room.price + 25}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => handleBookRoom("Bed & Breakfast", room.price + 25)}
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        textTransform: "none",
-                        py: 1.2,
-                        fontWeight: 600,
-                        "&:hover": { backgroundColor: "#1565c0" },
-                      }}
-                    >
-                      Book Now
-                    </Button>
-                  </Box>
-                </Stack>
-              </Box>
-            </Paper>
-
-            {/* Half Board Offer */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 3,
-                borderRadius: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transition: "all 0.2s",
-                "&:hover": { borderColor: "#1976d2", boxShadow: 2 },
-              }}
-            >
-              <Box sx={{ flex: 1 }}>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                      Half Board
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      Breakfast & dinner included for 2 guests daily
-                    </Typography>
-                    <Stack direction="row" spacing={3}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Cancellation
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Free until 72h
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Payment
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Prepayment required
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Meals
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Breakfast + Dinner
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-                  <Box sx={{ textAlign: "right", minWidth: 180 }}>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      Total per night
-                    </Typography>
-                    <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}>
-                      ${room.price + 50}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => handleBookRoom("Half Board", room.price + 50)}
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        textTransform: "none",
-                        py: 1.2,
-                        fontWeight: 600,
-                        "&:hover": { backgroundColor: "#1565c0" },
-                      }}
-                    >
-                      Book Now
-                    </Button>
-                  </Box>
-                </Stack>
-              </Box>
-            </Paper>
-
-            {/* Full Board Offer */}
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 3,
-                borderRadius: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transition: "all 0.2s",
-                "&:hover": { borderColor: "#1976d2", boxShadow: 2 },
-              }}
-            >
-              <Box sx={{ flex: 1 }}>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                  <Box sx={{ flex: 1 }}>
-                    <Stack direction="row" spacing={1} alignItems="center" mb={0.5}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Full Board
+                      <Stack direction="row" spacing={3}>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            Cancellation
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            Free until 7 days
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            Payment
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            Prepayment required
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            Meals
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            All meals included
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Box>
+                    <Box sx={{ textAlign: "right", minWidth: 180 }}>
+                      <Typography variant="caption" color="text.secondary" display="block">
+                        Total per night
                       </Typography>
-                      <Chip
-                        label="Best Value"
-                        size="small"
+                      <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}>
+                        ${rt.rateprice}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={() => handleBookRoom(rt, rt.rateprice)}
                         sx={{
-                          height: 22,
-                          fontSize: "0.7rem",
-                          backgroundColor: "#ff9800",
-                          color: "white",
+                          backgroundColor: "#1976d2",
+                          textTransform: "none",
+                          py: 1.2,
                           fontWeight: 600,
+                          "&:hover": { backgroundColor: "#1565c0" },
                         }}
-                      />
-                    </Stack>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      All meals included - breakfast, lunch & dinner for 2 guests
-                    </Typography>
-                    <Stack direction="row" spacing={3}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Cancellation
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Free until 7 days
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Payment
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          Prepayment required
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
-                          Meals
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          All meals included
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-                  <Box sx={{ textAlign: "right", minWidth: 180 }}>
-                    <Typography variant="caption" color="text.secondary" display="block">
-                      Total per night
-                    </Typography>
-                    <Typography variant="h4" sx={{ color: "#1976d2", fontWeight: 700, mb: 1 }}>
-                      ${room.price + 75}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => handleBookRoom("Full Board", room.price + 75)}
-                      sx={{
-                        backgroundColor: "#1976d2",
-                        textTransform: "none",
-                        py: 1.2,
-                        fontWeight: 600,
-                        "&:hover": { backgroundColor: "#1565c0" },
-                      }}
-                    >
-                      Book Now
-                    </Button>
-                  </Box>
-                </Stack>
-              </Box>
-            </Paper>
+                      >
+                        Book Now
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Box>
+              </Paper>))}
           </Stack>
         </Box>
       </Collapse>

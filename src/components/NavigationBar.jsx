@@ -64,9 +64,8 @@ const NavigationBar = () => {
           </Box>
         </Box>
 
-        {/* Right side */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {!isMobile && (
+          {/* {!isMobile && (
             <>
               <Typography
                 sx={{
@@ -85,7 +84,7 @@ const NavigationBar = () => {
                 Sign In
               </Typography>
             </>
-          )}
+          )} */}
           {/* <IconButton color="inherit" size="small">
             <PersonIcon />
           </IconButton>

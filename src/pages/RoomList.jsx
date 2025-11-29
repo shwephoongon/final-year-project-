@@ -27,49 +27,51 @@ import CustomDateRangePicker from "../components/CustomDateRangePicker";
 import RoomFilterBar from "../components/RoomFilterBar";
 import RoomCard from "../components/RoomCard";
 import RoomSelectionTracker from "../components/RoomSelectionTracker";
+import { supabase } from "../supabaseclient";
 
-const roomData = {
-  Deluxe: [
-    {
-      title: "Deluxe Queen Room",
-      size: "350 sq ft / 32 sqm",
-      description:
-        "Two Chamber Design with King Bed featuring a Sleeping Lounge & Dressing Room separated by privacy doors. Showcasing hardwood floors, iconic make-up vanity & walk-in shower with rainfall shower head.",
-      price: 120,
-      amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
-    },
-    {
-      title: "Deluxe King Room",
-      size: "370 sq ft / 34 sqm",
-      description:
-        "Spacious king bed room with city views, premium bedding, and ensuite bathroom.",
-      price: 140,
-      amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
-    },
-  ],
-  Suite: [
-    {
-      title: "Junior Suite",
-      size: "500 sq ft / 46 sqm",
-      description:
-        "Large suite with separate living area, luxurious king bed, and ensuite bathroom.",
-      price: 220,
-      amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
-    },
-  ],
-  Standard: [
-    {
-      title: "Standard Queen Room",
-      size: "280 sq ft / 26 sqm",
-      description: "Comfortable room with queen bed and basic amenities.",
-      price: 90,
-      amenities: ["Wi-Fi", "Breakfast"],
-    },
-  ],
-};
+// const roomData = {
+//   Deluxe: [
+//     {
+//       title: "Deluxe Queen Room",
+//       size: "350 sq ft / 32 sqm",
+//       description:
+//         "Two Chamber Design with King Bed featuring a Sleeping Lounge & Dressing Room separated by privacy doors. Showcasing hardwood floors, iconic make-up vanity & walk-in shower with rainfall shower head.",
+//       price: 120,
+//       amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
+//     },
+//     {
+//       title: "Deluxe King Room",
+//       size: "370 sq ft / 34 sqm",
+//       description:
+//         "Spacious king bed room with city views, premium bedding, and ensuite bathroom.",
+//       price: 140,
+//       amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
+//     },
+//   ],
+//   Suite: [
+//     {
+//       title: "Junior Suite",
+//       size: "500 sq ft / 46 sqm",
+//       description:
+//         "Large suite with separate living area, luxurious king bed, and ensuite bathroom.",
+//       price: 220,
+//       amenities: ["Wi-Fi", "Breakfast", "Private Bath"],
+//     },
+//   ],
+//   Standard: [
+//     {
+//       title: "Standard Queen Room",
+//       size: "280 sq ft / 26 sqm",
+//       description: "Comfortable room with queen bed and basic amenities.",
+//       price: 90,
+//       amenities: ["Wi-Fi", "Breakfast"],
+//     },
+//   ],
+// };
 
 const RoomList = () => {
   const [selectedBed, setSelectedBed] = useState("Queen");
+  const [roomData, setRoomData] = useState([]);
   const [showOffers, setShowOffers] = useState(false);
   const [activeTab, setActiveTab] = useState("Deluxe");
   const [filters, setFilters] = useState({
@@ -82,11 +84,13 @@ const RoomList = () => {
   const [checkOut, setCheckOut] = useState("");
   const [numRooms, setNumRooms] = useState(1);
   const [numGuests, setNumGuests] = useState(1);
+  const [selectedTab, setSelectedTab] = useState("");
+  const [roomRates, setRoomRates] = useState([]);
 
   // inside your component
   const [dateRange, setDateRange] = useState([null, null]);
   const [rooms, setRooms] = useState([{ guests: 1 }]);
-  
+
   // Room selection tracking
   const [totalRoomsToSelect, setTotalRoomsToSelect] = useState(1);
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -103,46 +107,95 @@ const RoomList = () => {
     updated[index].guests = guests;
     setRooms(updated);
   };
-  
+
+  const handleChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
   // Handle room selection from RoomCard
   const handleRoomSelect = (roomData, offerType) => {
+    console.log("check", roomData, offerType);
+    const qty = rooms[currentRoomIndex]?.guests || 1; 
     const newSelection = {
       roomIndex: currentRoomIndex,
       roomData,
-      offerType,
+       offerType: {
+      ...offerType,
+      quantity: qty, 
+    },
     };
-    
+
     const updatedSelections = [...selectedRooms];
     updatedSelections[currentRoomIndex] = newSelection;
     setSelectedRooms(updatedSelections);
-    
+
     // Move to next room if not all selected
     if (currentRoomIndex < totalRoomsToSelect - 1) {
       setCurrentRoomIndex(currentRoomIndex + 1);
     }
   };
-  
+
   // Handle room removal
   const handleRemoveRoom = (index) => {
     const updatedSelections = [...selectedRooms];
     updatedSelections[index] = null; // Set to null instead of removing to maintain indices
     setSelectedRooms(updatedSelections);
-    
+
     // Set current index to the removed room if it was after current
     if (index <= currentRoomIndex) {
       setCurrentRoomIndex(index);
     }
   };
-  
+  const roomsForActiveTab = roomData.filter(
+    (rt) => rt.roomtypename === selectedTab
+  );
+
   // Navigate to enhancements page
   const handleNavigateToEnhancements = () => {
     // Filter out null values before storing
-    const validSelections = selectedRooms.filter(room => room !== null);
-    localStorage.setItem('selectedRooms', JSON.stringify(validSelections));
+    const validSelections = selectedRooms.filter((room) => room !== null);
+    localStorage.setItem("selectedRooms", JSON.stringify(validSelections));
     // Navigate to enhancements page
-    window.location.href = '/Enhancement';
+    window.location.href = "/Enhancement";
   };
 
+  const getRoomRatesByType = async (roomTypeId) => {
+    const { data, error } = await supabase
+      .from("roomrates")
+      .select("*")
+      .eq("roomtypeid", roomTypeId);
+    console.log(data);
+    if (!error) setRoomRates(data);
+  };
+
+  useEffect(() => {
+    const fetchRoomTypes = async () => {
+      const { data, error } = await supabase
+        .from("roomtype")
+        .select("*")
+        .order("roomtypeid", { ascending: true });
+      if (data && data.length > 0) {
+        console.log('jjj',data)
+        setRoomData(data);
+        setSelectedTab(data[0].roomtypename);
+        getRoomRatesByType(data[0].roomtypeid);
+        // default tab
+      }
+
+      if (error) {
+        console.error("Error fetching room types:", error.message);
+      } else {
+        setRoomData(data);
+      }
+    };
+
+    fetchRoomTypes();
+  }, []);
+  useEffect(() => {
+    if (roomsForActiveTab.length > 0) {
+      getRoomRatesByType(roomsForActiveTab[0].roomtypeid);
+    }
+  }, [selectedTab]);
   return (
     <Box sx={{ minHeight: "100vh" }}>
       {/* Blue Bar with Filters */}
@@ -171,15 +224,34 @@ const RoomList = () => {
         </Stack>
       </Box>
       <BookingProgress />
-      {/* Tabs */}
       <Box
-        // sx={{
-        //   display: "flex",
-        //   justifyContent: "flex-start",
-        //   mt: 3,
-        //   width: "85%", // match the card stack width
-        //   mx: "auto", // keep it centered horizontally in the viewport
-        // }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mt: 3,
+          width: "85%",
+          mx: "auto",
+        }}
+      >
+        <Tabs
+          value={selectedTab}
+          onChange={handleChange}
+          variant='scrollable'
+          scrollButtons='auto'
+        >
+          {roomData?.map((rt) => (
+            <Tab
+              key={rt.roomtypeid}
+              label={rt.roomtypename}
+              value={rt.roomtypename}
+            />
+          ))}
+        </Tabs>
+
+        <RoomFilterBar filters={filters} setFilters={setFilters} />
+      </Box>
+      {/* Tabs */}
+      {/* <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -198,9 +270,8 @@ const RoomList = () => {
             <Tab key={category} label={category} value={category} />
           ))}
         </Tabs>
-        {/* Filter component */}
         <RoomFilterBar filters={filters} setFilters={setFilters} />
-      </Box>
+      </Box> */}
       {/* Room Cards */}
       <Box
         sx={{
@@ -211,11 +282,11 @@ const RoomList = () => {
           pb: selectedRooms.length > 0 ? 12 : 4, // Add padding if tracker is visible
         }}
       >
-        <Stack spacing={3} sx={{ width: "85%" }}>
-          {roomData[activeTab].map((room, idx) => {
+        {/* <Stack spacing={3} sx={{ width: "85%" }}>
+          {roomsForActiveTab.map((room, idx) => {
             // Check if this room is selected in ANY of the selected rooms
             const selectedRoomIndex = selectedRooms.findIndex(
-              selectedRoom => selectedRoom && selectedRoom.roomData.title === room.title
+              selectedRoom => selectedRoom && selectedRoom.roomData.roomtypename === room.title
             );
             const isSelected = selectedRoomIndex !== -1;
             
@@ -233,9 +304,33 @@ const RoomList = () => {
               />
             );
           })}
+        </Stack> */}
+        <Stack spacing={3} sx={{ width: "85%" }}>
+          {roomsForActiveTab.map((rt, idx) => (
+            <RoomCard
+              key={idx}
+              //room={rt}
+              room={{
+                roomtypeid:rt.roomtypeid,
+                roomtypename: rt.roomtypename,
+                capacity: rt.capacity,
+                size_sqm: rt.size_sqm,
+                size_sqft: rt.size_sqft,
+                amenities: rt.amenities,
+                base_price: rt.base_price,
+                viewoffers: roomRates,
+              }}
+              idx={idx}
+              onRoomSelect={handleRoomSelect}
+              onRemoveRoom={handleRemoveRoom}
+              currentRoomIndex={currentRoomIndex}
+              totalRooms={totalRoomsToSelect}
+              isSelected={false} // update if needed
+            />
+          ))}
         </Stack>
       </Box>
-      
+
       {/* Room Selection Tracker */}
       <RoomSelectionTracker
         totalRooms={totalRoomsToSelect}
