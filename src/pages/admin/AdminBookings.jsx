@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -72,16 +72,32 @@ const AdminBookings = () => {
     setConfirmDialog({ open: false, action: "", booking: null });
   };
 
-  const handleAction = () => {
+  const handleAction = async () => {
     const { booking, action } = confirmDialog;
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.id === booking.id
-          ? { ...b, status: action === "confirm" ? "Confirmed" : "Rejected" }
-          : b
-      )
-    );
-    closeDialog();
+
+    try {
+      const { error } = await supabase
+        .from("bookinghead")
+        .update({
+          payment_status: action === "confirm" ? "Confirmed" : "Rejected",
+        })
+        .eq("bookingid", booking.id);
+
+      if (error) throw error;
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === booking.id
+            ? { ...b, status: action === "confirm" ? "Confirmed" : "Rejected" }
+            : b
+        )
+      );
+
+      closeDialog();
+    } catch (err) {
+      console.error("Error updating booking status:", err.message);
+      alert("Failed to update booking status. Please try again.");
+    }
   };
 
   const getStatusColor = (status) => {
@@ -97,8 +113,7 @@ const AdminBookings = () => {
 
   const filteredBookings = bookings.filter(
     (b) =>
-      b.guestName.toLowerCase().includes(search.toLowerCase()) ||
-      b.roomType.toLowerCase().includes(search.toLowerCase())
+      b.guestName.toLowerCase().includes(search.toLowerCase()) 
   );
 
   return (
@@ -111,7 +126,7 @@ const AdminBookings = () => {
       <Box mb={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
         <TextField
           size='small'
-          placeholder='Search guest or room...'
+          placeholder='Search guest'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           sx={{ width: 300 }}
@@ -129,8 +144,8 @@ const AdminBookings = () => {
         <Table>
           <TableHead sx={{ backgroundColor: "#e3f2fd" }}>
             <TableRow>
+              <TableCell sx={{ fontWeight: 700 }}>BookingID</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Guest Name</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Room Type</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Check-in</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Check-out</TableCell>
               <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
@@ -144,8 +159,8 @@ const AdminBookings = () => {
             {filteredBookings.length > 0 ? (
               filteredBookings.map((booking) => (
                 <TableRow key={booking.id} hover>
+                  <TableCell>{booking.id}</TableCell>
                   <TableCell>{booking.guestName}</TableCell>
-                  <TableCell>{booking.roomType}</TableCell>
                   <TableCell>{booking.checkIn}</TableCell>
                   <TableCell>{booking.checkOut}</TableCell>
                   <TableCell>

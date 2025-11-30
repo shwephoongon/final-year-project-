@@ -22,11 +22,11 @@ const AdminLogin = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/admin/dashboard");
+      if (data.session) navigate("/admin/bookings");
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) navigate("/admin/dashboard");
+      if (session) navigate("/admin/bookings");
     });
 
     return () => listener.subscription.unsubscribe();
@@ -44,7 +44,7 @@ const AdminLogin = () => {
     if (error) {
       setErrorMsg(error.message);
     } else {
-      navigate("/admin/dashboard");
+      navigate("/admin/bookings");
     }
   };
 

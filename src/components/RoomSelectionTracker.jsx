@@ -1,20 +1,38 @@
 import React from "react";
-import { Box, Paper, Typography, Button, LinearProgress, Chip } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  LinearProgress,
+  Chip,
+} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-export default function RoomSelectionTracker({ 
-  totalRooms, 
-  currentRoomIndex, 
+export default function RoomSelectionTracker({
+  totalRooms,
+  currentRoomIndex,
   selectedRooms,
-  onNavigateToEnhancements
+  onNavigateToEnhancements,
 }) {
+  const [currentRoomStep, setCurrentRoomStep] = useState(0);
+
   const navigate = useNavigate();
-  console.log('selectedrooms',selectedRooms)
-  // Calculate progress
-  const progress = (selectedRooms.length / totalRooms) * 100;
-  const allRoomsSelected = selectedRooms.length === totalRooms;
+
+  // const progress = (selectedRooms.length / totalRooms) * 100;
+  // const allRoomsSelected = selectedRooms.length === totalRooms;
+
+  const selectedCount = selectedRooms.reduce(
+    (sum, item) => sum + (item?.quantity || 0),
+    0
+  );
+  const progress = (selectedCount / totalRooms) * 100;
+  const allRoomsSelected = selectedCount >= totalRooms; // Use >= to prevent overflow
+  // const progress = (selectedCount / totalRooms) * 100;
+  // const allRoomsSelected = selectedCount === totalRooms;
 
   const handleContinue = () => {
     if (allRoomsSelected) {
@@ -26,7 +44,6 @@ export default function RoomSelectionTracker({
       }
     }
   };
-
 
   // Don't show if no rooms selected
   if (selectedRooms.length === 0) {
@@ -48,7 +65,7 @@ export default function RoomSelectionTracker({
     >
       {/* Progress Bar */}
       <LinearProgress
-        variant="determinate"
+        variant='determinate'
         value={progress}
         sx={{
           height: 4,
@@ -73,56 +90,83 @@ export default function RoomSelectionTracker({
         {/* Left: Room Selection Status */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
           <Box>
-            <Typography variant="caption" color="text.secondary" display="block">
+            <Typography
+              variant='caption'
+              color='text.secondary'
+              display='block'
+            >
               Room Selection Progress
             </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: "#1976d2" }}>
+            <Typography variant='h6' sx={{ fontWeight: 700, color: "#1976d2" }}>
               {allRoomsSelected ? (
                 <>
-                  <CheckCircleIcon sx={{ fontSize: 20, mr: 1, verticalAlign: "middle", color: "#4caf50" }} />
+                  <CheckCircleIcon
+                    sx={{
+                      fontSize: 20,
+                      mr: 1,
+                      verticalAlign: "middle",
+                      color: "#4caf50",
+                    }}
+                  />
                   All Rooms Selected
                 </>
               ) : (
-                `Select Room ${currentRoomIndex + 1} of ${totalRooms}`
+                `Select Room ${Math.min(
+                  currentRoomStep + 1,
+                  totalRooms
+                )} of ${totalRooms}`
               )}
             </Typography>
           </Box>
 
           {/* Room Status Chips */}
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {Array.from({ length: totalRooms }).map((_, index) => (
-              <Chip
-                key={index}
-                label={selectedRooms[index] ? `${selectedRooms[index].roomData.roomtypename} - ${selectedRooms[index].offerType.ratename}` : `Room ${index + 1}`}
-                size="small"
-                icon={selectedRooms[index] ? <CheckCircleIcon /> : undefined}
-                sx={{
-                  fontWeight: 600,
-                  bgcolor: selectedRooms[index] ? "#e8f5e9" : "#f5f5f5",
-                  color: selectedRooms[index] ? "#4caf50" : "#9e9e9e",
-                  border: currentRoomIndex === index && !selectedRooms[index] 
-                    ? "2px solid #1976d2" 
-                    : "none",
-                  maxWidth: 300,
-                  "& .MuiChip-icon": {
+            {selectedRooms.map((item, idx) =>
+              item ? (
+                <Chip
+                  key={idx}
+                  label={
+                    item.quantity > 1
+                      ? `${item.roomData.roomtypename} - ${item.offerType.ratename} ×${item.quantity}`
+                      : `${item.roomData.roomtypename} - ${item.offerType.ratename}`
+                  }
+                  size='small'
+                  icon={<CheckCircleIcon />}
+                  sx={{
+                    fontWeight: 600,
+                    bgcolor: "#e8f5e9",
                     color: "#4caf50",
-                  },
-                }}
-              />
-            ))}
+                    maxWidth: 300,
+                    "& .MuiChip-icon": { color: "#4caf50" },
+                  }}
+                />
+              ) : (
+                <Chip
+                  key={idx}
+                  label={`Room ${idx + 1}`}
+                  size='small'
+                  sx={{
+                    fontWeight: 600,
+                    bgcolor: "#f5f5f5",
+                    color: "#9e9e9e",
+                    maxWidth: 300,
+                  }}
+                />
+              )
+            )}
           </Box>
         </Box>
 
         {/* Right: Action Button */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {!allRoomsSelected && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant='body2' color='text.secondary'>
               {selectedRooms.length} of {totalRooms} rooms selected
             </Typography>
           )}
           <Button
-            variant="contained"
-            size="large"
+            variant='contained'
+            size='large'
             disabled={!allRoomsSelected}
             endIcon={<ArrowForwardIcon />}
             onClick={handleContinue}
@@ -135,10 +179,14 @@ export default function RoomSelectionTracker({
               fontSize: "1rem",
               bgcolor: allRoomsSelected ? "#4caf50" : "#e0e0e0",
               color: allRoomsSelected ? "white" : "#9e9e9e",
-              boxShadow: allRoomsSelected ? "0 4px 12px rgba(76, 175, 80, 0.3)" : "none",
+              boxShadow: allRoomsSelected
+                ? "0 4px 12px rgba(76, 175, 80, 0.3)"
+                : "none",
               "&:hover": {
                 bgcolor: allRoomsSelected ? "#45a049" : "#e0e0e0",
-                boxShadow: allRoomsSelected ? "0 6px 16px rgba(76, 175, 80, 0.4)" : "none",
+                boxShadow: allRoomsSelected
+                  ? "0 6px 16px rgba(76, 175, 80, 0.4)"
+                  : "none",
               },
               "&:disabled": {
                 bgcolor: "#e0e0e0",
@@ -146,7 +194,9 @@ export default function RoomSelectionTracker({
               },
             }}
           >
-            {allRoomsSelected ? "Continue to Enhancements" : "Select All Rooms First"}
+            {allRoomsSelected
+              ? "Continue to Enhancements"
+              : "Select All Rooms First"}
           </Button>
         </Box>
       </Box>

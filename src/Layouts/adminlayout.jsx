@@ -43,13 +43,13 @@ const AdminLayout = ({ children }) => {
 
   const navigationItems = [
     // { text: "Dashboard", icon: <DashboardIcon />, id: "admin/dashboard" },
+    { text: "Bookings", icon: <BookingsIcon />, id: "admin/bookings" },
     { text: "Rooms", icon: <RoomsIcon />, id: "admin/rooms" },
     // {
     //   text: "Enhancements",
     //   icon: <EnhancementsIcon />,
     //   id: "admin/enhancements",
     // },
-    { text: "Bookings", icon: <BookingsIcon />, id: "admin/bookings" },
     { text: "Logout", icon: <LogoutIcon />, action: handleLogout }, // new logout item
   ];
 

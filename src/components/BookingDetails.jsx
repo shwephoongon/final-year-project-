@@ -9,14 +9,13 @@ import {
 
 const BookingDetails = () => {
   const bookedRooms = JSON.parse(localStorage.getItem("selectedRooms")) || [];
-  let searchDataGet = JSON.parse(localStorage.getItem("searchdata")) || [];
-  const searchData = searchDataGet[0];
-  //const bookedRooms = storedRooms[0];
-  const totalRate = bookedRooms.reduce(
-  (sum, room) => sum + (room.offerType?.rateprice || 0),
-  0
-);
+  let searchData = JSON.parse(localStorage.getItem("searchdata")) || [];
 
+  // Total rate for all rooms
+  const totalRate = bookedRooms.reduce(
+    (sum, room) => sum + (room.offerType?.rateprice || 0) * room.quantity,
+    0
+  );
 
   return (
     <Box
@@ -51,13 +50,14 @@ const BookingDetails = () => {
         >
           Stay Details
         </Typography>
+
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant='body2' color='text.secondary'>
               Check-in:
             </Typography>
             <Typography variant='body2' fontWeight={600}>
-              {searchData.fromDate}
+              {searchData?.fromDate}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -65,7 +65,7 @@ const BookingDetails = () => {
               Check-out:
             </Typography>
             <Typography variant='body2' fontWeight={600}>
-              {searchData.toDate}
+              {searchData?.toDate}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -73,7 +73,7 @@ const BookingDetails = () => {
               Nights:
             </Typography>
             <Typography variant='body2' fontWeight={600}>
-              {searchData.nights}
+              {searchData?.nights}
             </Typography>
           </Box>
         </Box>
@@ -87,24 +87,36 @@ const BookingDetails = () => {
         >
           Rooms Booked
         </Typography>
+
         <List dense sx={{ mb: 1 }}>
-          {bookedRooms?.map((room, index) => (
-            <ListItem key={index} disableGutters sx={{ py: 1 }}>
-              <ListItemText
-                primary={
-                  <Typography variant='body2' fontWeight={600}>
-                    {room.roomData.roomtypename} ({room.offerType.ratename})
-                  </Typography>
-                }
-                secondary={
-                  <Typography
-                    variant='caption'
-                    color='text.secondary'
-                  ></Typography>
-                }
-              />
-            </ListItem>
-          ))}
+          {bookedRooms?.map((room, index) => {
+            const roomTotal = (room.offerType?.rateprice || 0) * room.quantity;
+            return (
+              <ListItem key={index} disableGutters sx={{ py: 1 }}>
+                <ListItemText
+                  primary={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      <Typography variant='body2' fontWeight={600}>
+                        {room.roomData.roomtypename} ({room.offerType.ratename}) ×{" "}
+                        {room.quantity}
+                      </Typography>
+                      <Typography variant='body2' fontWeight={600}>
+                        ${roomTotal}
+                      </Typography>
+                    </Box>
+                  }
+                  secondary={null}
+                />
+              </ListItem>
+            );
+          })}
         </List>
 
         <Divider sx={{ my: 2 }} />
@@ -127,7 +139,7 @@ const BookingDetails = () => {
             Total Amount
           </Typography>
           <Typography variant='h5' sx={{ fontWeight: 700, color: "#1976d2" }}>
-            ${totalRate}
+            ${totalRate * searchData.nights}
           </Typography>
         </Box>
       </Box>

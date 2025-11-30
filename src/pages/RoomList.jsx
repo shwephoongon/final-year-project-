@@ -112,27 +112,38 @@ const RoomList = () => {
     setSelectedTab(newValue);
   };
 
-  // Handle room selection from RoomCard
   const handleRoomSelect = (roomData, offerType) => {
-    console.log("check", roomData, offerType);
-    const qty = rooms[currentRoomIndex]?.guests || 1; 
-    const newSelection = {
-      roomIndex: currentRoomIndex,
+    const qty = 1; // You can change this if needed
+
+    const newItem = {
+      roomIndex: selectedRooms.length, // not really used anymore but safe to keep
+      quantity: qty,
       roomData,
-       offerType: {
-      ...offerType,
-      quantity: qty, 
-    },
+      offerType,
     };
 
-    const updatedSelections = [...selectedRooms];
-    updatedSelections[currentRoomIndex] = newSelection;
-    setSelectedRooms(updatedSelections);
+    const updated = [...selectedRooms];
 
-    // Move to next room if not all selected
-    if (currentRoomIndex < totalRoomsToSelect - 1) {
-      setCurrentRoomIndex(currentRoomIndex + 1);
+    // find match by roomType + rateId
+    const existingIndex = updated.findIndex(
+      (item) =>
+        item.roomData.roomtypeid === newItem.roomData.roomtypeid &&
+        item.offerType.rateid === newItem.offerType.rateid
+    );
+
+    if (existingIndex !== -1) {
+      // SAME roomType + SAME rate → increment qty
+      updated[existingIndex].quantity += qty;
+    } else {
+      // unique → add new item
+      updated.push(newItem);
     }
+
+    // update state
+    setSelectedRooms(updated);
+
+    // also update localStorage if you do it here
+    localStorage.setItem("selectedRooms", JSON.stringify(updated));
   };
 
   // Handle room removal
@@ -175,7 +186,7 @@ const RoomList = () => {
         .select("*")
         .order("roomtypeid", { ascending: true });
       if (data && data.length > 0) {
-        console.log('jjj',data)
+        console.log("jjj", data);
         setRoomData(data);
         setSelectedTab(data[0].roomtypename);
         getRoomRatesByType(data[0].roomtypeid);
@@ -223,7 +234,7 @@ const RoomList = () => {
           <RoomSelector onRoomCountChange={setTotalRoomsToSelect} />
         </Stack>
       </Box>
-      <BookingProgress />
+      <BookingProgress currentPage='Rooms & Packages'/>
       <Box
         sx={{
           display: "flex",
@@ -250,28 +261,6 @@ const RoomList = () => {
 
         <RoomFilterBar filters={filters} setFilters={setFilters} />
       </Box>
-      {/* Tabs */}
-      {/* <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          mt: 3,
-          width: "85%", // match the card stack width
-          mx: "auto",
-        }}
-      >
-        <Tabs
-          value={activeTab}
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          textColor='primary'
-          indicatorColor='primary'
-        >
-          {Object.keys(roomData).map((category) => (
-            <Tab key={category} label={category} value={category} />
-          ))}
-        </Tabs>
-        <RoomFilterBar filters={filters} setFilters={setFilters} />
-      </Box> */}
       {/* Room Cards */}
       <Box
         sx={{
@@ -282,36 +271,12 @@ const RoomList = () => {
           pb: selectedRooms.length > 0 ? 12 : 4, // Add padding if tracker is visible
         }}
       >
-        {/* <Stack spacing={3} sx={{ width: "85%" }}>
-          {roomsForActiveTab.map((room, idx) => {
-            // Check if this room is selected in ANY of the selected rooms
-            const selectedRoomIndex = selectedRooms.findIndex(
-              selectedRoom => selectedRoom && selectedRoom.roomData.roomtypename === room.title
-            );
-            const isSelected = selectedRoomIndex !== -1;
-            
-            return (
-              <RoomCard 
-                key={idx}
-                room={room} 
-                idx={idx}
-                onRoomSelect={handleRoomSelect}
-                onRemoveRoom={handleRemoveRoom}
-                currentRoomIndex={currentRoomIndex}
-                totalRooms={totalRoomsToSelect}
-                isSelected={isSelected}
-                selectedRoomIndex={selectedRoomIndex} // Pass the actual index of the selected room
-              />
-            );
-          })}
-        </Stack> */}
         <Stack spacing={3} sx={{ width: "85%" }}>
           {roomsForActiveTab.map((rt, idx) => (
             <RoomCard
               key={idx}
-              //room={rt}
               room={{
-                roomtypeid:rt.roomtypeid,
+                roomtypeid: rt.roomtypeid,
                 roomtypename: rt.roomtypename,
                 capacity: rt.capacity,
                 size_sqm: rt.size_sqm,
@@ -325,7 +290,7 @@ const RoomList = () => {
               onRemoveRoom={handleRemoveRoom}
               currentRoomIndex={currentRoomIndex}
               totalRooms={totalRoomsToSelect}
-              isSelected={false} // update if needed
+              isSelected={false}
             />
           ))}
         </Stack>

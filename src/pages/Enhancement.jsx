@@ -17,6 +17,7 @@ import UpgradeDrawer from "../components/UpgradeDrawer";
 import BookingDetails from "../components/BookingDetails";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseclient";
+import BookingProgress from "../components/BookingProgress";
 
 const Enhancement = () => {
   const [selected, setSelected] = useState([]);
@@ -36,23 +37,12 @@ const Enhancement = () => {
   const toggleDrawer = (status) => setDrawerOpen(status);
   const navigate = useNavigate();
   const [enhancements, setEnhancements] = useState([]);
-     const stored = localStorage.getItem("selectedRooms");
-    const searchData = localStorage.getItem("searchdata");
+  const stored = localStorage.getItem("selectedRooms");
+  const searchData = localStorage.getItem("searchdata");
 
   useEffect(() => {
     fetchEnhancements();
   }, []);
-
-  // useEffect(() => {
-  //   const stored = localStorage.getItem("selectedRooms");
-  //   const storedsearch = localStorage.getItem("searchdata");
-  //   if (stored) {
-  //     console.log("Selected rooms:", JSON.parse(stored));
-  //     console.log("Search Data", JSON.parse(storedsearch));
-  //   } else {
-  //     console.log("No selected rooms found.");
-  //   }
-  // }, []);
 
   const fetchEnhancements = async () => {
     const { data, error } = await supabase
@@ -88,6 +78,10 @@ const Enhancement = () => {
         width: "100%",
       }}
     >
+      <Box sx={{ width:'90%'}}>
+       <BookingProgress currentPage="Enhancements" />
+      </Box>
+
       {/* Page Header */}
       <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
         <Typography

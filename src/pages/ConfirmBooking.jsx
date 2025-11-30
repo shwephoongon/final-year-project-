@@ -12,11 +12,11 @@ import {
 import BookingDetails from "../components/BookingDetails";
 import { useState } from "react";
 import { supabase } from "../supabaseclient";
+import BookingProgress from "../components/BookingProgress";
 
 const ConfirmBooking = () => {
   const bookedRooms = JSON.parse(localStorage.getItem("selectedRooms")) || [];
-  let searchDataGet = JSON.parse(localStorage.getItem("searchdata")) || [];
-  const searchData = searchDataGet[0];
+  let searchData = JSON.parse(localStorage.getItem("searchdata")) || [];
   //const bookedRooms = storedRooms[0];
   const totalRate = bookedRooms.reduce(
     (sum, room) => sum + (room.offerType?.rateprice || 0),
@@ -82,13 +82,10 @@ const ConfirmBooking = () => {
 
       const totalRoomAmount = bookedRooms.reduce((sum, room) => {
         const rate = room.offerType?.rateprice || 0;
-        const nights = room.offerType?.nights || 1;
+        const nights = searchData.nights || 1;
         return sum + rate * nights;
       }, 0);
 
-      // -----------------------------------------
-      // 2. Insert bookinghead
-      // -----------------------------------------
       const { data: bookingHeadData, error: bookingHeadError } = await supabase
         .from("bookinghead")
         .insert([
@@ -100,6 +97,7 @@ const ConfirmBooking = () => {
             total_enhancement_amount: 0,
             payment_status: "Pending",
             created_at: new Date(),
+            nights: searchData.nights,
           },
         ])
         .select("bookingid")
@@ -113,8 +111,8 @@ const ConfirmBooking = () => {
         bookingid: bookingid,
         roomtypeid: room.roomData.roomtypeid, // TODO: map your real roomtypeid
         rate_per_night: room.offerType.rateprice,
-        nights: 1,
-        //room_total: room.rate * room.quantity * stayDetails.nights,
+        qty: room.quantity,
+        room_total: room.offerType.rateprice * room.quantity,
       }));
 
       const { error: detailError } = await supabase
@@ -140,6 +138,9 @@ const ConfirmBooking = () => {
         width: "100%",
       }}
     >
+      <Box sx={{ width: "90%" }}>
+        <BookingProgress currentPage='Checkout' />
+      </Box>
       {/* Page Header */}
       <Container maxWidth={false} sx={{ width: "90%", mb: 4 }}>
         <Typography
@@ -188,18 +189,18 @@ const ConfirmBooking = () => {
                 <Box display='flex' mb={2}>
                   <TextField
                     label='First Name'
-                    value={guest.firstName}
+                    value={guest.firstname}
                     onChange={(e) =>
-                      setGuest({ ...guest, firstName: e.target.value })
+                      setGuest({ ...guest, firstname: e.target.value })
                     }
                     size='small'
                     sx={textFieldStyle}
                   />
                   <TextField
                     label='Last Name'
-                    value={guest.lastName}
+                    value={guest.lastname}
                     onChange={(e) =>
-                      setGuest({ ...guest, lastName: e.target.value })
+                      setGuest({ ...guest, lastname: e.target.value })
                     }
                     size='small'
                     sx={textFieldStyle}

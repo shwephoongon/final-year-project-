@@ -1,6 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Divider } from "@mui/material";
 
-const BookingProgress = () => {
+const BookingProgress = ({ currentPage }) => {
   const steps = [
     "Property, Guests & Date",
     "Rooms & Packages",
@@ -8,15 +8,16 @@ const BookingProgress = () => {
     "Checkout",
   ];
 
-  const activeStep = 1; // Example: Rooms & Packages
+  // Determine the index of the current page
+  const activeStep = steps.indexOf(currentPage);
 
   return (
     <Box
       sx={{
-        width: "85%",      // match RoomList tabs & cards
-        mx: "auto",        // center horizontally
+        width: "85%", // match RoomList tabs & cards
+        mx: "auto", // center horizontally
         pt: 3,
-        pb: 2,
+        pb: 4,
       }}
     >
       <Box
@@ -52,15 +53,12 @@ const BookingProgress = () => {
                   justifyContent: "center",
                   fontWeight: 600,
                   fontSize: "0.9rem",
-                  color: isActive ? "white"
-                    : isCompleted ? "white"
-                      : "#555",
+                  color: isActive || isCompleted ? "white" : "#555",
                   backgroundColor: isActive
-                    ? "#1976d2"
-                     : isCompleted
-                     ? "#4caf50"
-                    : "#e0e0e0",
-                  // border: isCompleted ? "2px solid #1976d2" : "2px solid transparent",
+                    ? "#1976d2" // current step = blue
+                    : isCompleted
+                    ? "#4caf50" // completed steps = green
+                    : "#e0e0e0", // next steps = grey
                 }}
               >
                 {index + 1}
@@ -68,12 +66,16 @@ const BookingProgress = () => {
 
               {/* Label Beside Circle */}
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   fontWeight: isActive ? 600 : 400,
-                  color: isActive ? "#1976d2" : "#666",
+                  color: isActive
+                    ? "#1976d2"
+                    : isCompleted
+                    ? "#4caf50"
+                    : "#666",
                   whiteSpace: "nowrap",
-                  fontSize:'0.9rem'
+                  fontSize: "0.9rem",
                 }}
               >
                 {label}
@@ -82,6 +84,7 @@ const BookingProgress = () => {
           );
         })}
       </Box>
+
     </Box>
   );
 };
